@@ -2,11 +2,14 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>FinPulse · Калькулятор</title>
 <meta name="description" content="Интерактивный калькулятор FinPulse с Lifestyle Mirror AI, целями накоплений, прогнозом 5 лет, и анализом подписок.">
-<link rel="manifest" href="/manifest.json">
+<link rel="manifest" href="../manifest.json">
 <meta name="theme-color" content="#FFB422">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FinPulse">
 <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%23FFB422' width='192' height='192'/><circle cx='96' cy='96' r='48' fill='%23FFFFFF'/></svg>">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -53,13 +56,17 @@
     line-height:1.5;
     font-feature-settings:'cv02','cv03','cv04','cv11','ss01';
     min-height:100vh;
-    padding-bottom:88px;
+    padding-bottom:calc(88px + env(safe-area-inset-bottom));
     font-weight:400;
     letter-spacing:-0.005em;
+    -webkit-tap-highlight-color:transparent;
   }
   .num{font-variant-numeric:tabular-nums;font-feature-settings:'tnum'}
 
-  .wrap{max-width:1180px;margin:0 auto;padding:24px 24px 0}
+  .wrap{
+    max-width:1180px;margin:0 auto;
+    padding:max(24px,env(safe-area-inset-top)) max(24px,env(safe-area-inset-right)) 0 max(24px,env(safe-area-inset-left));
+  }
 
   /* ========== TOPBAR ========== */
   .topbar{
@@ -98,16 +105,16 @@
   }
   .btn-ghost{
     background:transparent;border:1px solid var(--border);
-    color:var(--text-2);padding:7px 14px;border-radius:8px;
+    color:var(--text-2);padding:11px 16px;border-radius:10px;
     font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;
-    transition:all .15s;
+    transition:all .15s;min-height:44px;
   }
-  .btn-ghost:hover{background:var(--surface-2);color:var(--text);border-color:var(--border-strong)}
+  @media(hover:hover){.btn-ghost:hover{background:var(--surface-2);color:var(--text);border-color:var(--border-strong)}}
 
   /* ========== HERO ========== */
   .hero{
-    margin-bottom:80px;
-    padding:32px 0 0;
+    margin-bottom:96px;
+    padding:24px 0 0;
   }
   .eyebrow{
     display:inline-flex;align-items:center;gap:8px;
@@ -163,8 +170,8 @@
 
   /* ========== SECTIONS ========== */
   .sec{margin-bottom:80px}
-  .sec-h{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:24px;flex-wrap:wrap;gap:8px}
-  .sec-h h2{font-size:28px;font-weight:600;color:var(--text);letter-spacing:-0.02em;line-height:1.15}
+  .sec-h{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:28px;flex-wrap:wrap;gap:8px}
+  .sec-h h2{font-size:36px;font-weight:700;color:var(--text);letter-spacing:-0.025em;line-height:1.1}
   .sec-h .sec-sub{font-size:14px;color:var(--text-3);font-weight:400}
 
   /* ========== PRESETS ========== */
@@ -175,10 +182,13 @@
     cursor:pointer;text-align:left;font-family:inherit;
     transition:all .18s ease;position:relative;
   }
-  .preset:hover{
-    border-color:var(--text);transform:translateY(-1px);
-    box-shadow:var(--sh-hover);
+  @media(hover:hover){
+    .preset:hover{
+      border-color:var(--text);transform:translateY(-1px);
+      box-shadow:var(--sh-hover);
+    }
   }
+  .preset:active{transform:scale(0.98);border-color:var(--text)}
   .preset-emoji{
     width:32px;height:32px;border-radius:8px;
     background:var(--surface-3);
@@ -195,45 +205,45 @@
     border-radius:14px;padding:24px;
     transition:border-color .15s;
   }
-  .data-card:hover{border-color:var(--border-strong)}
-  .dc-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;padding-bottom:14px;border-bottom:1px solid var(--border-faint)}
-  .dc-title{display:flex;align-items:center;gap:12px;min-width:0}
+  @media(hover:hover){.data-card:hover{border-color:var(--border-strong)}}
+  .dc-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;gap:12px;padding-bottom:18px;border-bottom:1px solid var(--border-faint)}
+  .dc-title{display:flex;align-items:center;gap:14px;min-width:0}
   .dc-emoji{
-    width:32px;height:32px;border-radius:8px;
+    width:40px;height:40px;border-radius:10px;
     background:var(--surface-3);
     display:flex;align-items:center;justify-content:center;
-    font-size:15px;flex-shrink:0;
+    font-size:18px;flex-shrink:0;
   }
-  .dc-name{font-size:14px;font-weight:600;color:var(--text);letter-spacing:-0.01em}
-  .dc-sub{font-size:12px;color:var(--text-3);margin-top:1px;font-weight:400}
+  .dc-name{font-size:20px;font-weight:700;color:var(--text);letter-spacing:-0.015em;line-height:1.2}
+  .dc-sub{font-size:12px;color:var(--text-3);margin-top:2px;font-weight:400}
   .dc-total{text-align:right;flex-shrink:0}
   .dc-total .lbl{font-size:10px;letter-spacing:0.10em;color:var(--text-3);text-transform:uppercase;font-weight:500;margin-bottom:2px}
   .dc-total .v{
-    font-size:18px;font-weight:600;color:var(--text);
+    font-size:22px;font-weight:700;color:var(--text);
     font-variant-numeric:tabular-nums;line-height:1;
     letter-spacing:-0.02em;
   }
 
   /* ITEM ROWS */
   .item{
-    display:grid;grid-template-columns:32px 1fr 100px 24px;
-    gap:8px;align-items:center;
-    padding:6px;border-radius:10px;margin-bottom:2px;
+    display:grid;grid-template-columns:44px 1fr 110px 44px;
+    gap:6px;align-items:center;
+    padding:4px;border-radius:10px;margin-bottom:2px;
     transition:background .12s;
   }
-  .item:hover{background:var(--surface-2)}
+  @media(hover:hover){.item:hover{background:var(--surface-2)}}
   .item-icon{
-    width:32px;height:32px;border-radius:8px;
+    width:44px;height:44px;border-radius:10px;
     background:var(--surface-3);
     display:flex;align-items:center;justify-content:center;
-    font-size:15px;cursor:pointer;user-select:none;
+    font-size:18px;cursor:pointer;user-select:none;
     transition:all .15s;
   }
-  .item-icon:hover{background:var(--gold-soft);transform:scale(1.05)}
+  @media(hover:hover){.item-icon:hover{background:var(--gold-soft);transform:scale(1.05)}}
   .item-name{
     background:transparent;border:none;outline:none;
-    font-size:14px;color:var(--text);font-weight:500;
-    padding:6px 4px;font-family:inherit;width:100%;min-width:0;
+    font-size:16px;color:var(--text);font-weight:500;
+    padding:10px 4px;font-family:inherit;width:100%;min-width:0;
     border-bottom:1px solid transparent;transition:border .15s;
     letter-spacing:-0.005em;
   }
@@ -241,34 +251,36 @@
   .item-amt-wrap{position:relative}
   .item-amt{
     background:transparent;border:1px solid transparent;
-    border-radius:6px;outline:none;
-    font-size:14px;color:var(--text);font-weight:600;
-    padding:6px 24px 6px 10px;font-family:inherit;width:100%;
+    border-radius:8px;outline:none;
+    font-size:16px;color:var(--text);font-weight:600;
+    padding:10px 26px 10px 10px;font-family:inherit;width:100%;
     text-align:right;font-variant-numeric:tabular-nums;
     transition:all .15s;-moz-appearance:textfield;
   }
   .item-amt::-webkit-outer-spin-button,.item-amt::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-  .item-amt:hover{background:var(--surface-2)}
+  @media(hover:hover){.item-amt:hover{background:var(--surface-2)}}
   .item-amt:focus{border-color:var(--gold);background:var(--surface)}
   .item-suffix{
-    position:absolute;right:8px;top:50%;transform:translateY(-50%);
-    font-size:11px;color:var(--text-3);pointer-events:none;font-weight:500;
+    position:absolute;right:10px;top:50%;transform:translateY(-50%);
+    font-size:12px;color:var(--text-3);pointer-events:none;font-weight:500;
   }
   .item-rm{
     background:transparent;border:none;color:var(--text-4);
-    cursor:pointer;font-size:16px;width:24px;height:24px;border-radius:6px;
+    cursor:pointer;font-size:20px;width:44px;height:44px;border-radius:10px;
     transition:all .15s;display:flex;align-items:center;justify-content:center;
   }
-  .item-rm:hover{background:rgba(220,38,38,0.10);color:var(--danger)}
+  @media(hover:hover){.item-rm:hover{background:rgba(220,38,38,0.10);color:var(--danger)}}
+  .item-rm:active{background:rgba(220,38,38,0.10);color:var(--danger)}
   .add-btn{
     width:100%;background:transparent;
     border:1px dashed var(--border-strong);color:var(--text-2);
-    padding:11px;border-radius:10px;
-    font-size:13px;font-weight:500;cursor:pointer;
-    margin-top:10px;transition:all .15s;font-family:inherit;
-    letter-spacing:-0.005em;
+    padding:14px;border-radius:10px;
+    font-size:14px;font-weight:500;cursor:pointer;
+    margin-top:12px;transition:all .15s;font-family:inherit;
+    letter-spacing:-0.005em;min-height:48px;
   }
-  .add-btn:hover{border-color:var(--gold);color:var(--gold-deep);background:var(--gold-subtle);border-style:solid}
+  @media(hover:hover){.add-btn:hover{border-color:var(--gold);color:var(--gold-deep);background:var(--gold-subtle);border-style:solid}}
+  .add-btn:active{border-color:var(--gold);color:var(--gold-deep);background:var(--gold-subtle);border-style:solid}
 
   /* ========== MIRROR HERO ========== */
   .mirror-hero{
@@ -299,11 +311,12 @@
   .mh-nav{display:flex;gap:6px;align-items:center}
   .mh-nav-btn{
     background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);
-    width:36px;height:36px;border-radius:50%;cursor:pointer;
-    font-size:16px;color:#fff;font-family:inherit;
+    width:44px;height:44px;border-radius:50%;cursor:pointer;
+    font-size:18px;color:#fff;font-family:inherit;
     transition:all .15s;display:flex;align-items:center;justify-content:center;
   }
-  .mh-nav-btn:hover{background:var(--gold);border-color:var(--gold);color:var(--text)}
+  @media(hover:hover){.mh-nav-btn:hover{background:var(--gold);border-color:var(--gold);color:var(--text)}}
+  .mh-nav-btn:active{background:var(--gold);border-color:var(--gold);color:var(--text)}
   .mh-pager{
     font-size:12px;color:rgba(255,255,255,0.5);font-weight:500;
     min-width:38px;text-align:center;letter-spacing:0.04em;
@@ -330,23 +343,29 @@
     border-radius:14px;padding:22px;cursor:pointer;font-family:inherit;
     text-align:left;transition:all .18s ease;position:relative;
   }
-  .module-card:hover{border-color:var(--text);transform:translateY(-1px);box-shadow:var(--sh-hover)}
+  @media(hover:hover){.module-card:hover{border-color:var(--text);transform:translateY(-1px);box-shadow:var(--sh-hover)}}
+  .module-card:active:not(.expanded){transform:scale(0.99);border-color:var(--text)}
   .module-card.expanded{
     border-color:var(--text);box-shadow:var(--sh-pop);
     grid-column:1/-1;cursor:default;transform:none;
   }
   .mc-h{display:flex;justify-content:space-between;align-items:flex-start;gap:14px}
   .mc-emoji{
-    width:36px;height:36px;border-radius:8px;
+    width:44px;height:44px;border-radius:10px;
     background:var(--surface-3);
     display:flex;align-items:center;justify-content:center;
-    font-size:16px;flex-shrink:0;transition:all .18s;
+    font-size:20px;flex-shrink:0;transition:all .18s;
   }
   .module-card:hover .mc-emoji,.module-card.expanded .mc-emoji{background:var(--gold-soft)}
   .mc-title-wrap{flex:1;min-width:0}
-  .mc-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:2px;letter-spacing:-0.01em}
-  .mc-desc{font-size:12px;color:var(--text-3);line-height:1.4;font-weight:400}
-  .mc-arrow{color:var(--text-3);font-size:12px;transition:transform .25s;flex-shrink:0;margin-top:6px}
+  .mc-title{font-size:18px;font-weight:700;color:var(--text);margin-bottom:3px;letter-spacing:-0.015em;line-height:1.2}
+  .mc-desc{font-size:13px;color:var(--text-3);line-height:1.4;font-weight:400}
+  .mc-arrow{
+    color:var(--text-2);font-size:14px;font-weight:700;
+    transition:transform .25s;flex-shrink:0;
+    width:32px;height:32px;border-radius:50%;background:var(--surface-3);
+    display:flex;align-items:center;justify-content:center;
+  }
   .module-card.expanded .mc-arrow{transform:rotate(180deg);color:var(--text)}
   .mc-content{display:none;margin-top:24px;padding-top:24px;border-top:1px solid var(--border)}
   .module-card.expanded .mc-content{display:block;animation:expand .3s ease}
@@ -368,14 +387,14 @@
     font-size:9px;font-weight:600;cursor:help;text-transform:none;
   }
   .m-input{
-    background:var(--surface);border:1px solid var(--border);border-radius:8px;
-    padding:11px 36px 11px 14px;font-size:15px;color:var(--text);font-weight:500;
-    font-family:inherit;width:100%;outline:none;
+    background:var(--surface);border:1px solid var(--border);border-radius:10px;
+    padding:14px 40px 14px 14px;font-size:16px;color:var(--text);font-weight:500;
+    font-family:inherit;width:100%;outline:none;min-height:48px;
     font-variant-numeric:tabular-nums;transition:all .15s;
     -moz-appearance:textfield;letter-spacing:-0.005em;
   }
   .m-input::-webkit-outer-spin-button,.m-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-  .m-input:hover{border-color:var(--border-strong)}
+  @media(hover:hover){.m-input:hover{border-color:var(--border-strong)}}
   .m-input:focus{border-color:var(--text);box-shadow:0 0 0 3px rgba(0,0,0,0.04)}
   .m-input-wrap{position:relative}
   .m-input-suffix{
@@ -437,22 +456,23 @@
 
   /* SUBS */
   .sub-item{
-    display:grid;grid-template-columns:32px 1fr 100px 80px 24px;
-    gap:8px;align-items:center;
-    padding:6px;border-radius:10px;margin-bottom:2px;
+    display:grid;grid-template-columns:44px 1fr 110px 80px 44px;
+    gap:6px;align-items:center;
+    padding:4px;border-radius:10px;margin-bottom:2px;
     transition:background .12s;
   }
-  .sub-item:hover{background:var(--surface-2)}
+  @media(hover:hover){.sub-item:hover{background:var(--surface-2)}}
   .sub-item.unused{background:rgba(220,38,38,0.04)}
   .sub-toggle{
     display:flex;align-items:center;justify-content:center;
-    cursor:pointer;width:32px;height:32px;border-radius:8px;font-size:14px;
+    cursor:pointer;width:44px;height:44px;border-radius:10px;font-size:18px;
     transition:all .15s;user-select:none;font-weight:700;
   }
-  .sub-toggle.on{background:rgba(22,163,74,0.10);color:var(--success)}
-  .sub-toggle.off{background:rgba(220,38,38,0.10);color:var(--danger)}
+  .sub-toggle.on{background:rgba(22,163,74,0.12);color:var(--success)}
+  .sub-toggle.off{background:rgba(220,38,38,0.12);color:var(--danger)}
+  .sub-toggle:active{transform:scale(0.92)}
   .sub-yearly{
-    text-align:right;font-size:11px;color:var(--text-3);
+    text-align:right;font-size:12px;color:var(--text-3);
     font-variant-numeric:tabular-nums;font-weight:500;
   }
 
@@ -490,7 +510,8 @@
     cursor:pointer;font-family:inherit;
     transition:all .18s;
   }
-  .final-cta:hover{background:var(--gold-bright);transform:translateY(-1px);box-shadow:var(--sh-gold)}
+  @media(hover:hover){.final-cta:hover{background:var(--gold-bright);transform:translateY(-1px);box-shadow:var(--sh-gold)}}
+  .final-cta:active{background:var(--gold-bright);transform:scale(0.97)}
 
   footer{
     margin-top:48px;padding:24px 0;border-top:1px solid var(--border-faint);
@@ -500,12 +521,12 @@
 
   /* ========== STICKY BAR ========== */
   .sticky-bar{
-    position:fixed;bottom:16px;left:50%;
+    position:fixed;bottom:max(16px,env(safe-area-inset-bottom));left:50%;
     background:rgba(9,9,11,0.94);backdrop-filter:blur(20px) saturate(180%);
     -webkit-backdrop-filter:blur(20px) saturate(180%);
     border:1px solid rgba(255,255,255,0.08);
     color:#fff;
-    border-radius:100px;padding:10px 18px;
+    border-radius:100px;padding:12px 20px;
     box-shadow:var(--sh-pop);
     display:flex;align-items:center;gap:18px;
     z-index:50;font-size:13px;
@@ -526,32 +547,98 @@
 
   /* TOOLTIP */
   [data-tip]{position:relative}
-  [data-tip]:hover::after{
+  @media(hover:hover){
+    [data-tip]:hover::after{
+      content:attr(data-tip);position:absolute;bottom:130%;left:50%;
+      transform:translateX(-50%);background:var(--text);color:#fff;
+      padding:6px 10px;border-radius:6px;font-size:11px;font-weight:500;
+      white-space:nowrap;z-index:100;pointer-events:none;
+      text-transform:none;letter-spacing:0;
+    }
+  }
+  [data-tip].tip-show::after{
     content:attr(data-tip);position:absolute;bottom:130%;left:50%;
     transform:translateX(-50%);background:var(--text);color:#fff;
-    padding:6px 10px;border-radius:6px;font-size:11px;font-weight:500;
-    white-space:nowrap;z-index:100;
+    padding:8px 12px;border-radius:8px;font-size:12px;font-weight:500;
+    white-space:nowrap;z-index:100;pointer-events:none;
     text-transform:none;letter-spacing:0;
+    animation:tipPop .25s ease;
   }
+  @keyframes tipPop{from{opacity:0;transform:translateX(-50%) translateY(4px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 
   @keyframes fadeUp{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
   .fadeUp{animation:fadeUp .35s ease both}
 
   /* RESPONSIVE */
   @media(max-width:980px){
-    .wrap{padding:16px 16px 0}
-    h1.hero-h{font-size:42px;letter-spacing:-0.035em}
-    .hero{padding-top:16px;margin-bottom:48px}
-    .pulse-strip{grid-template-columns:1fr 1fr;gap:20px;padding:24px}
+    .wrap{
+      padding:max(16px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) 0 max(16px,env(safe-area-inset-left));
+    }
+    .topbar{margin-bottom:32px;padding-bottom:16px}
+    h1.hero-h{font-size:40px;letter-spacing:-0.035em;line-height:1.05;margin-bottom:16px}
+    .hero{padding-top:8px;margin-bottom:48px}
+    .hero-lead{font-size:15px;line-height:1.5}
+    .eyebrow{font-size:11px;margin-bottom:14px}
+
+    .sec{margin-bottom:48px}
+    .sec-h{margin-bottom:20px}
+    .sec-h h2{font-size:30px;font-weight:700;letter-spacing:-0.025em}
+    .sec-h .sec-sub{font-size:13px}
+
+    .pulse-strip{
+      grid-template-columns:1fr 1fr 1fr;
+      gap:14px;padding:22px 20px;margin-top:32px;
+    }
+    .ps-pulse{grid-column:1/-1;padding-bottom:18px;border-bottom:1px solid rgba(255,255,255,0.10)}
+    .ps-ring{width:72px;height:72px}
+    .ps-ring svg{width:72px;height:72px}
+    .ps-ring-num{font-size:20px}
+    .ps-pulse-meta .ps-l{font-size:10px}
+    .ps-pulse-meta .ps-v{font-size:20px}
     .ps-divider{display:none}
-    .presets-grid{grid-template-columns:repeat(2,1fr)}
-    .data-grid{grid-template-columns:1fr}
-    .modules-grid{grid-template-columns:1fr}
-    .m-grid{grid-template-columns:1fr}
-    .sec-h h2{font-size:24px}
+    .ps-cell .ps-l{font-size:10px}
+    .ps-cell .ps-v{font-size:20px}
+
+    .presets-grid{grid-template-columns:repeat(2,1fr);gap:10px}
+    .preset{padding:16px}
+    .preset-emoji{width:36px;height:36px;font-size:18px;margin-bottom:12px}
+
+    .data-grid{grid-template-columns:1fr;gap:14px}
+    .data-card{padding:20px}
+    .dc-name{font-size:18px}
+    .dc-emoji{width:36px;height:36px;font-size:16px}
+    .dc-total .v{font-size:20px}
+
+    .modules-grid{grid-template-columns:1fr;gap:10px}
+    .module-card{padding:18px}
+    .mc-title{font-size:17px}
+    .mc-emoji{width:40px;height:40px;font-size:18px}
+    .m-grid{grid-template-columns:1fr;gap:18px}
+
+    .mirror-hero{padding:28px 22px 24px;border-radius:16px}
     .mh-body{font-size:17px}
-    .cta-section{padding:36px 24px}
+    .mh-text-2{font-size:15px}
+
+    .cta-section{padding:36px 24px;margin-top:48px;border-radius:16px}
     .cta-section h3{font-size:24px}
+    .cta-section p{font-size:14px}
+    .final-cta{width:100%;padding:16px 28px;font-size:15px}
+
+    .result-hero{padding:22px 18px}
+    .rh-v{font-size:32px}
+
+    .time-row{grid-template-columns:1fr 72px 84px}
+    .tr-amt{font-size:11px}
+    .tr-time{font-size:13px}
+
+    .sub-item{grid-template-columns:44px 1fr 96px 44px}
+    .sub-yearly{display:none}
+  }
+  @media(max-width:420px){
+    h1.hero-h{font-size:34px}
+    .sec-h h2{font-size:26px}
+    .pulse-strip{padding:18px 16px}
+    .ps-cell .ps-v,.ps-pulse-meta .ps-v{font-size:18px}
   }
 </style>
 </head>
@@ -735,21 +822,21 @@
               <div class="m-field">
                 <span class="m-label">Сумма цели</span>
                 <div class="m-input-wrap">
-                  <input class="m-input" type="number" id="goal-amount" value="300000" min="0" step="10000">
+                  <input class="m-input" type="text" inputmode="numeric" pattern="[0-9]*" id="goal-amount" value="300000" min="0" step="10000">
                   <span class="m-input-suffix">₽</span>
                 </div>
               </div>
               <div class="m-field">
                 <span class="m-label">Уже накоплено</span>
                 <div class="m-input-wrap">
-                  <input class="m-input" type="number" id="goal-saved" value="50000" min="0" step="5000">
+                  <input class="m-input" type="text" inputmode="numeric" pattern="[0-9]*" id="goal-saved" value="50000" min="0" step="5000">
                   <span class="m-input-suffix">₽</span>
                 </div>
               </div>
               <div class="m-field">
                 <span class="m-label">Срок (месяцев)</span>
                 <div class="m-input-wrap">
-                  <input class="m-input" type="number" id="goal-months" value="12" min="1" max="240" step="1">
+                  <input class="m-input" type="text" inputmode="numeric" pattern="[0-9]*" id="goal-months" value="12" min="1" max="240" step="1">
                   <span class="m-input-suffix">мес</span>
                 </div>
               </div>
@@ -790,21 +877,21 @@
               <div class="m-field">
                 <span class="m-label">Сумма кредита</span>
                 <div class="m-input-wrap">
-                  <input class="m-input" type="number" id="loan-amount" value="500000" min="0" step="10000">
+                  <input class="m-input" type="text" inputmode="numeric" pattern="[0-9]*" id="loan-amount" value="500000" min="0" step="10000">
                   <span class="m-input-suffix">₽</span>
                 </div>
               </div>
               <div class="m-field">
                 <span class="m-label">Ставка % годовых</span>
                 <div class="m-input-wrap">
-                  <input class="m-input" type="number" id="loan-rate" value="22" min="0" max="100" step="0.1">
+                  <input class="m-input" type="text" inputmode="decimal" id="loan-rate" value="22" min="0" max="100" step="0.1">
                   <span class="m-input-suffix">%</span>
                 </div>
               </div>
               <div class="m-field">
                 <span class="m-label">Срок (месяцев)</span>
                 <div class="m-input-wrap">
-                  <input class="m-input" type="number" id="loan-months" value="36" min="1" max="360" step="1">
+                  <input class="m-input" type="text" inputmode="numeric" pattern="[0-9]*" id="loan-months" value="36" min="1" max="360" step="1">
                   <span class="m-input-suffix">мес</span>
                 </div>
               </div>
@@ -844,28 +931,28 @@
               <div class="m-field">
                 <span class="m-label">Стартовая сумма</span>
                 <div class="m-input-wrap">
-                  <input class="m-input" type="number" id="fc-start" value="50000" min="0" step="10000">
+                  <input class="m-input" type="text" inputmode="numeric" pattern="[0-9]*" id="fc-start" value="50000" min="0" step="10000">
                   <span class="m-input-suffix">₽</span>
                 </div>
               </div>
               <div class="m-field">
                 <span class="m-label">Откладывать в месяц <span class="info" data-tip="Из остатка">i</span></span>
                 <div class="m-input-wrap">
-                  <input class="m-input" type="number" id="fc-monthly" value="20000" min="0" step="1000">
+                  <input class="m-input" type="text" inputmode="numeric" pattern="[0-9]*" id="fc-monthly" value="20000" min="0" step="1000">
                   <span class="m-input-suffix">₽</span>
                 </div>
               </div>
               <div class="m-field">
                 <span class="m-label">Доходность годовых <span class="info" data-tip="12% депозит, 15% ETF, 20% акции">i</span></span>
                 <div class="m-input-wrap">
-                  <input class="m-input" type="number" id="fc-rate" value="12" min="0" max="50" step="0.5">
+                  <input class="m-input" type="text" inputmode="decimal" id="fc-rate" value="12" min="0" max="50" step="0.5">
                   <span class="m-input-suffix">%</span>
                 </div>
               </div>
               <div class="m-field">
                 <span class="m-label">Период (лет)</span>
                 <div class="m-input-wrap">
-                  <input class="m-input" type="number" id="fc-years" value="5" min="1" max="20" step="1">
+                  <input class="m-input" type="text" inputmode="numeric" pattern="[0-9]*" id="fc-years" value="5" min="1" max="20" step="1">
                   <span class="m-input-suffix">лет</span>
                 </div>
               </div>
@@ -940,14 +1027,14 @@
               <div class="m-field">
                 <span class="m-label">Ставка в час <span class="info" data-tip="Доход ÷ часы работы">i</span></span>
                 <div class="m-input-wrap">
-                  <input class="m-input" type="number" id="time-rate" value="565" min="0" step="10">
+                  <input class="m-input" type="text" inputmode="numeric" pattern="[0-9]*" id="time-rate" value="565" min="0" step="10">
                   <span class="m-input-suffix">₽/ч</span>
                 </div>
               </div>
               <div class="m-field">
                 <span class="m-label">Часов работы в месяц</span>
                 <div class="m-input-wrap">
-                  <input class="m-input" type="number" id="time-hours" value="168" min="1" max="500" step="1">
+                  <input class="m-input" type="text" inputmode="numeric" pattern="[0-9]*" id="time-hours" value="168" min="1" max="500" step="1">
                   <span class="m-input-suffix">ч</span>
                 </div>
               </div>
@@ -1079,7 +1166,7 @@
         <div class="item-icon" data-id="${s.id}" data-tip="Кликни — сменить">${s.icon}</div>
         <input class="item-name" type="text" value="${s.name.replace(/"/g,'&quot;')}" data-id="${s.id}" placeholder="Название">
         <div class="item-amt-wrap">
-          <input class="item-amt" type="number" value="${s.amount}" min="0" step="500" data-id="${s.id}">
+          <input class="item-amt" type="text" inputmode="numeric" pattern="[0-9]*" value="${s.amount}" min="0" step="500" data-id="${s.id}">
           <span class="item-suffix">₽</span>
         </div>
         <button class="item-rm" data-id="${s.id}" data-tip="Удалить">×</button>
@@ -1310,7 +1397,7 @@
 
   function updateLoan(){
     const P = +document.getElementById('loan-amount').value || 0;
-    const annualRate = +document.getElementById('loan-rate').value || 0;
+    const annualRate = +(String(document.getElementById('loan-rate').value).replace(',','.')) || 0;
     const n = Math.max(1, +document.getElementById('loan-months').value || 1);
     const r = annualRate / 100 / 12;
     let monthly = r === 0 ? P / n : P * (r * Math.pow(1+r, n)) / (Math.pow(1+r, n) - 1);
@@ -1337,7 +1424,7 @@
   function updateForecast(){
     const start = +document.getElementById('fc-start').value || 0;
     const monthly = +document.getElementById('fc-monthly').value || 0;
-    const annualRate = +document.getElementById('fc-rate').value || 0;
+    const annualRate = +(String(document.getElementById('fc-rate').value).replace(',','.')) || 0;
     const years = Math.max(1, +document.getElementById('fc-years').value || 1);
     const r = annualRate / 100 / 12;
     const labels = ['Старт'];
@@ -1420,7 +1507,7 @@
         <div class="sub-toggle ${s.used?'on':'off'}" data-id="${s.id}" data-tip="${s.used?'Использую':'Не использую'}">${s.used?'✓':'✗'}</div>
         <input class="item-name" type="text" value="${s.name.replace(/"/g,'&quot;')}" data-id="${s.id}" placeholder="Название">
         <div class="item-amt-wrap">
-          <input class="item-amt" type="number" value="${s.cost}" min="0" step="50" data-id="${s.id}">
+          <input class="item-amt" type="text" inputmode="numeric" pattern="[0-9]*" value="${s.cost}" min="0" step="50" data-id="${s.id}">
           <span class="item-suffix">₽/м</span>
         </div>
         <div class="sub-yearly">${fmt(s.cost*12)}/год</div>
@@ -1535,9 +1622,22 @@
     obs.observe(pulseStripEl);
   }
 
+  // Tap-tooltips for touch devices
+  const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+  if (isTouch) {
+    document.addEventListener('click', (e) => {
+      const tip = e.target.closest('[data-tip]');
+      document.querySelectorAll('.tip-show').forEach(el => { if (el !== tip) el.classList.remove('tip-show'); });
+      if (tip) {
+        tip.classList.toggle('tip-show');
+        setTimeout(() => tip.classList.remove('tip-show'), 2200);
+      }
+    });
+  }
+
   // Service Worker registration
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW registration failed:', err));
+    navigator.serviceWorker.register('../sw.js', {scope: '../'}).catch(err => console.log('SW registration failed:', err));
   }
 </script>
 </body>
