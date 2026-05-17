@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FinPulse · Этап 1 — Исследование рынка</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --gold:#D4AF37;
+    --gold-soft:#E8C766;
+    --gold-deep:#B8860B;
+    --pearl:#F8F4EC;
+    --pearl-deep:#EDE6D3;
+    --ink:#0E0E10;
+    --ink-soft:#1A1A1F;
+    --ink-card:#22222A;
+    --line:rgba(212,175,55,0.18);
+    --text-mute:#A8A89E;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--ink);color:var(--pearl);font-family:'Helvetica Neue',-apple-system,BlinkMacSystemFont,sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased}
+  body{overflow-x:hidden}
+
+  /* Subtle animated background */
+  .bg-aura{position:fixed;inset:0;pointer-events:none;z-index:0;
+    background:radial-gradient(800px 600px at 15% 10%,rgba(212,175,55,0.08),transparent 60%),
+               radial-gradient(900px 700px at 85% 90%,rgba(212,175,55,0.05),transparent 60%),
+               radial-gradient(600px 500px at 50% 50%,rgba(232,199,102,0.03),transparent 70%);
+    animation:drift 18s ease-in-out infinite alternate}
+  @keyframes drift{from{transform:translate(0,0)}to{transform:translate(-30px,20px)}}
+
+  .wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:48px 28px}
+
+  /* Header */
+  .brand{display:flex;align-items:center;gap:14px;margin-bottom:8px}
+  .pulse{width:46px;height:46px;border-radius:50%;background:radial-gradient(circle,var(--gold-soft),var(--gold-deep));position:relative;box-shadow:0 0 24px rgba(212,175,55,0.35)}
+  .pulse::before,.pulse::after{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid var(--gold);animation:ping 2.4s cubic-bezier(0,0,0.2,1) infinite}
+  .pulse::after{animation-delay:1.2s}
+  @keyframes ping{0%{transform:scale(1);opacity:0.8}100%{transform:scale(2.4);opacity:0}}
+  .brand-name{font-size:22px;letter-spacing:6px;font-weight:300;color:var(--pearl)}
+  .brand-name b{color:var(--gold);font-weight:600}
+
+  .stage-tag{display:inline-block;font-size:11px;letter-spacing:4px;color:var(--gold);border:1px solid var(--gold);padding:6px 14px;border-radius:24px;margin-top:14px;text-transform:uppercase}
+  h1{font-size:64px;line-height:1.04;margin:18px 0 14px;font-weight:300;letter-spacing:-1px}
+  h1 b{font-weight:600;background:linear-gradient(135deg,var(--gold-soft) 0%,var(--gold) 50%,var(--gold-deep) 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .lead{font-size:18px;color:var(--text-mute);max-width:720px}
+
+  /* KPI grid */
+  .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin:42px 0 18px}
+  .kpi{background:linear-gradient(180deg,var(--ink-card),var(--ink-soft));border:1px solid var(--line);border-radius:18px;padding:22px;position:relative;overflow:hidden;transition:transform .35s ease,border-color .35s ease}
+  .kpi:hover{transform:translateY(-4px);border-color:var(--gold)}
+  .kpi::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:0;transition:opacity .35s}
+  .kpi:hover::before{opacity:1}
+  .kpi .label{font-size:11px;letter-spacing:2px;color:var(--text-mute);text-transform:uppercase}
+  .kpi .num{font-size:36px;color:var(--gold);font-weight:600;margin:8px 0 4px;font-variant-numeric:tabular-nums}
+  .kpi .sub{font-size:13px;color:var(--pearl)}
+
+  /* Section */
+  section{margin:64px 0}
+  h2{font-size:32px;font-weight:300;letter-spacing:-0.5px;margin-bottom:8px}
+  h2 .accent{color:var(--gold);font-weight:600}
+  .sub-line{color:var(--text-mute);font-size:15px;max-width:640px;margin-bottom:28px}
+
+  /* Chart cards */
+  .chart-card{background:linear-gradient(180deg,var(--ink-soft),var(--ink));border:1px solid var(--line);border-radius:20px;padding:28px;margin-bottom:18px}
+  .chart-row{display:grid;grid-template-columns:1.2fr 1fr;gap:18px}
+  .chart-h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:18px}
+  .chart-h h3{font-size:18px;font-weight:500;color:var(--pearl)}
+  .chart-h .src{font-size:11px;color:var(--text-mute);letter-spacing:1px}
+  .chart-box{height:300px;position:relative}
+
+  /* Tabs */
+  .tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+  .tab{padding:10px 18px;border:1px solid var(--line);border-radius:30px;cursor:pointer;font-size:13px;color:var(--text-mute);transition:all .25s ease;background:transparent}
+  .tab:hover{color:var(--pearl)}
+  .tab.active{background:var(--gold);color:var(--ink);border-color:var(--gold);font-weight:600}
+  .panel{display:none;animation:fadeIn .4s ease}
+  .panel.active{display:block}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+  /* Trends grid */
+  .trends{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .trend{background:var(--ink-card);border:1px solid var(--line);border-radius:16px;padding:22px;transition:all .3s}
+  .trend:hover{border-color:var(--gold);transform:translateY(-2px)}
+  .trend .ico{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--gold),var(--gold-deep));display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--ink);font-weight:700;margin-bottom:14px}
+  .trend h4{font-size:16px;font-weight:600;margin-bottom:8px;color:var(--pearl)}
+  .trend p{font-size:13px;color:var(--text-mute)}
+
+  /* Insight band */
+  .insight{background:linear-gradient(135deg,rgba(212,175,55,0.08),rgba(212,175,55,0.02));border:1px solid var(--gold);border-radius:20px;padding:32px;margin:24px 0;position:relative;overflow:hidden}
+  .insight::before{content:"";position:absolute;top:-30px;right:-30px;width:140px;height:140px;border-radius:50%;background:radial-gradient(circle,rgba(212,175,55,0.25),transparent 70%)}
+  .insight h3{font-size:22px;color:var(--gold);font-weight:500;margin-bottom:12px}
+  .insight p{color:var(--pearl);font-size:15px;max-width:780px;position:relative}
+
+  /* Geo grid */
+  .geo{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .geo-card{background:linear-gradient(180deg,var(--ink-card),var(--ink-soft));border:1px solid var(--line);border-radius:18px;padding:24px;transition:all .35s}
+  .geo-card:hover{border-color:var(--gold)}
+  .geo-card .flag{font-size:30px;margin-bottom:8px}
+  .geo-card h4{font-size:18px;font-weight:600;color:var(--pearl);margin-bottom:6px}
+  .geo-card .stat{font-size:28px;color:var(--gold);font-weight:600;margin:10px 0;font-variant-numeric:tabular-nums}
+  .geo-card .desc{font-size:13px;color:var(--text-mute);line-height:1.6}
+  .geo-card .row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px}
+  .geo-card .row:last-child{border-bottom:none}
+  .geo-card .row span:last-child{color:var(--gold);font-weight:600}
+
+  /* Conclusion */
+  .conclusion{background:linear-gradient(135deg,var(--ink-card),var(--ink-soft));border:1px solid var(--gold);border-radius:24px;padding:40px;text-align:center;margin-top:48px}
+  .conclusion .verdict{display:inline-block;background:var(--gold);color:var(--ink);padding:6px 16px;border-radius:20px;font-size:12px;letter-spacing:3px;font-weight:600;text-transform:uppercase;margin-bottom:16px}
+  .conclusion h3{font-size:30px;font-weight:300;color:var(--pearl);margin-bottom:14px;letter-spacing:-0.5px}
+  .conclusion h3 b{color:var(--gold);font-weight:600}
+  .conclusion p{color:var(--text-mute);max-width:720px;margin:0 auto;font-size:15px}
+
+  footer{margin-top:60px;padding-top:24px;border-top:1px solid var(--line);text-align:center;color:var(--text-mute);font-size:12px;letter-spacing:2px}
+
+  @media(max-width:880px){
+    h1{font-size:42px}
+    .kpi-grid{grid-template-columns:repeat(2,1fr)}
+    .chart-row{grid-template-columns:1fr}
+    .trends{grid-template-columns:1fr}
+    .geo{grid-template-columns:1fr}
+  }
+
+  /* Scroll reveal */
+  .reveal{opacity:0;transform:translateY(24px);transition:all .8s ease}
+  .reveal.in{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+<div class="bg-aura"></div>
+<div class="wrap">
+
+  <header class="reveal">
+    <div class="brand">
+      <div class="pulse"></div>
+      <div class="brand-name">FIN<b>PULSE</b></div>
+    </div>
+    <div class="stage-tag">Этап 01 · Исследование рынка</div>
+    <h1>Рынок личных финансов <b>в эпоху роста</b></h1>
+    <p class="lead">Глобальный сегмент PFM-приложений переживает один из самых динамичных периодов за десятилетие. Уход международных игроков с российского рынка освободил пространство для нового поколения локальных продуктов. FinPulse попадает в идеальный момент времени.</p>
+  </header>
+
+  <!-- KPI Block -->
+  <div class="kpi-grid reveal">
+    <div class="kpi"><div class="label">Глобальный рынок 2025</div><div class="num">$31.7B</div><div class="sub">Personal Finance Apps</div></div>
+    <div class="kpi"><div class="label">Прогноз 2035</div><div class="num">$173.6B</div><div class="sub">CAGR ~18.5%</div></div>
+    <div class="kpi"><div class="label">FinTech Россия H1·25</div><div class="num">+16%</div><div class="sub">Рост сегмента</div></div>
+    <div class="kpi"><div class="label">Кыргызстан</div><div class="num">+45%</div><div class="sub">Цифровые платежи г/г</div></div>
+  </div>
+
+  <!-- Trend section -->
+  <section class="reveal">
+    <h2>Динамика рынка <span class="accent">в цифрах</span></h2>
+    <p class="sub-line">Прогнозируемый рост глобального рынка PFM-приложений и развитие финтеха в фокусных регионах.</p>
+
+    <div class="chart-row">
+      <div class="chart-card">
+        <div class="chart-h"><h3>Глобальный рынок Personal Finance Apps</h3><span class="src">$ Billion · 2024–2035</span></div>
+        <div class="chart-box"><canvas id="globalChart"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-h"><h3>Распределение по регионам</h3><span class="src">Доля в 2025</span></div>
+        <div class="chart-box"><canvas id="regionChart"></canvas></div>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-h"><h3>Финтех-рост в России и СНГ</h3><span class="src">% год/год</span></div>
+      <div class="chart-box" style="height:280px"><canvas id="cisChart"></canvas></div>
+    </div>
+  </section>
+
+  <!-- Geo -->
+  <section class="reveal">
+    <h2>География <span class="accent">FinPulse</span></h2>
+    <p class="sub-line">Три ключевых рынка с разными профилями зрелости — каждый открывает свою возможность.</p>
+    <div class="geo">
+      <div class="geo-card">
+        <div class="flag">🇷🇺</div>
+        <h4>Россия</h4>
+        <div class="stat">66 млрд ₽</div>
+        <div class="desc" style="margin-bottom:14px">Объём сегмента личных финансов в Q1 2025 (+16% г/г)</div>
+        <div class="row"><span>Активные пользователи PFM</span><span>+10% vs 2023</span></div>
+        <div class="row"><span>Прогноз FinTech роста</span><span>15–20%</span></div>
+        <div class="row"><span>Уход глобальных игроков</span><span>возможность</span></div>
+      </div>
+      <div class="geo-card">
+        <div class="flag">🇰🇬</div>
+        <h4>Кыргызстан</h4>
+        <div class="stat">85%</div>
+        <div class="desc" style="margin-bottom:14px">Прогнозный охват мобильным банкингом к 2026 году</div>
+        <div class="row"><span>Mobile-banking apps</span><span>28+</span></div>
+        <div class="row"><span>MBANK активная база</span><span>3 млн</span></div>
+        <div class="row"><span>FinTech стартапов</span><span>25</span></div>
+      </div>
+      <div class="geo-card">
+        <div class="flag">🌏</div>
+        <h4>СНГ / Центр. Азия</h4>
+        <div class="stat">CAGR 13.7%</div>
+        <div class="desc" style="margin-bottom:14px">Ожидаемый рост глобального PFM-tools рынка 2025–2033</div>
+        <div class="row"><span>Super-apps на подъёме</span><span>тренд</span></div>
+        <div class="row"><span>AI/ML интеграция</span><span>стандарт</span></div>
+        <div class="row"><span>Open Banking / BaaS</span><span>растёт</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Trends -->
+  <section class="reveal">
+    <h2>Ключевые тренды <span class="accent">формирующие рынок</span></h2>
+    <p class="sub-line">Направления, которые задают темп индустрии в 2025–2026 годах.</p>
+    <div class="trends">
+      <div class="trend"><div class="ico">AI</div><h4>Алгоритмы автокатегоризации</h4><p>ML-модели распознают траты по MCC-кодам и тексту операций — без ручной разметки. Стандарт de facto в новых PFM.</p></div>
+      <div class="trend"><div class="ico">⚡</div><h4>Open Banking & BaaS</h4><p>Интеграция через стандартизированные API стала технически доступной. Безопасный pull данных из банков и кошельков.</p></div>
+      <div class="trend"><div class="ico">📱</div><h4>Mobile-first и Super-apps</h4><p>В Центральной Азии финансовые приложения становятся ядром цифровой жизни — переводы, инвестиции, кредиты в одном окне.</p></div>
+      <div class="trend"><div class="ico">🛡️</div><h4>Безопасность как фича</h4><p>Биометрия, шифрование, локальное хранение данных и read-only доступ к счетам — обязательная гигиена нового продукта.</p></div>
+      <div class="trend"><div class="ico">🎯</div><h4>Персонализация</h4><p>Индивидуальные подсказки по экономии, инсайты "куда уходят деньги" и геймификация финансовых целей.</p></div>
+      <div class="trend"><div class="ico">💎</div><h4>Импортозамещение</h4><p>Mint, YNAB, Money Lover ушли или ограничили оплату. Локальные игроки получили окно возможностей и "пустой стул лидера".</p></div>
+    </div>
+  </section>
+
+  <!-- Insight -->
+  <div class="insight reveal">
+    <h3>Главный инсайт</h3>
+    <p>Количество россиян, отслеживающих свои расходы, выросло почти на <b style="color:var(--gold)">10% за год</b>. Финансовая грамотность растёт быстрее, чем рынок успевает её обслуживать — спрос на удобные локальные PFM-инструменты опережает предложение. Это окно возможностей для FinPulse шириной в 2–3 года.</p>
+  </div>
+
+  <!-- Conclusion -->
+  <div class="conclusion reveal">
+    <div class="verdict">Вердикт исследования</div>
+    <h3>Рынок <b>растёт, локализуется и ждёт</b> качественного продукта</h3>
+    <p>FinPulse выходит на формирующийся рынок с двузначными темпами роста, освобождённой нишей после ухода глобальных лидеров и аудиторией, готовой платить за удобство и безопасность. Условия для запуска — оптимальные.</p>
+  </div>
+
+  <footer>FINPULSE · ЭТАП 01 · ИССЛЕДОВАНИЕ РЫНКА · МАЙ 2026</footer>
+</div>
+
+<script>
+  // Charts
+  const goldGrad = (ctx,h)=>{const g=ctx.createLinearGradient(0,0,0,h);g.addColorStop(0,'rgba(212,175,55,0.6)');g.addColorStop(1,'rgba(212,175,55,0.02)');return g}
+
+  // Global market growth
+  const gctx=document.getElementById('globalChart').getContext('2d');
+  new Chart(gctx,{type:'line',data:{labels:['2024','2025','2027','2029','2031','2033','2035'],
+    datasets:[{label:'Personal Finance Apps ($B)',data:[26.5,31.7,46.5,67.8,98.5,135.2,173.6],
+      borderColor:'#D4AF37',backgroundColor:goldGrad(gctx,300),borderWidth:2.5,fill:true,tension:0.4,pointBackgroundColor:'#E8C766',pointBorderColor:'#D4AF37',pointRadius:5,pointHoverRadius:8}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#A8A89E'}}},
+      scales:{x:{grid:{color:'rgba(212,175,55,0.05)'},ticks:{color:'#A8A89E'}},y:{grid:{color:'rgba(212,175,55,0.05)'},ticks:{color:'#A8A89E',callback:v=>'$'+v+'B'}}}}});
+
+  // Regions doughnut
+  const rctx=document.getElementById('regionChart').getContext('2d');
+  new Chart(rctx,{type:'doughnut',data:{labels:['Северная Америка','Азия-ТР','Европа','Латам','MEA','СНГ'],
+    datasets:[{data:[38,28,18,7,5,4],backgroundColor:['#D4AF37','#E8C766','#B8860B','#8B6914','#5C4709','#3A2D06'],borderColor:'#0E0E10',borderWidth:3}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{legend:{position:'right',labels:{color:'#A8A89E',font:{size:12},padding:14}}}}});
+
+  // CIS bar chart
+  const cctx=document.getElementById('cisChart').getContext('2d');
+  new Chart(cctx,{type:'bar',data:{labels:['Россия Fintech 2024','Россия Fintech H1·25','PFM Россия 2024','PFM Россия Q1·25','Кыргызстан digital','СНГ Mobile Banking'],
+    datasets:[{label:'% роста г/г',data:[14,16,14,16,45,28],backgroundColor:['rgba(212,175,55,0.5)','rgba(212,175,55,0.7)','rgba(232,199,102,0.5)','rgba(232,199,102,0.7)','rgba(212,175,55,0.9)','rgba(232,199,102,0.6)'],borderColor:'#D4AF37',borderWidth:1.5,borderRadius:8}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#A8A89E'}}},
+      scales:{x:{grid:{display:false},ticks:{color:'#A8A89E',font:{size:11}}},y:{grid:{color:'rgba(212,175,55,0.05)'},ticks:{color:'#A8A89E',callback:v=>v+'%'}}}}});
+
+  // Reveal on scroll
+  const io=new IntersectionObserver((entries)=>entries.forEach(e=>e.isIntersecting&&e.target.classList.add('in')),{threshold:0.12});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>

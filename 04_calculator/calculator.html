@@ -1,0 +1,1544 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FinPulse · Калькулятор</title>
+<meta name="description" content="Интерактивный калькулятор FinPulse с Lifestyle Mirror AI, целями накоплений, прогнозом 5 лет, и анализом подписок.">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#FFB422">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%23FFB422' width='192' height='192'/><circle cx='96' cy='96' r='48' fill='%23FFFFFF'/></svg>">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FFFFFF;
+    --surface:#FFFFFF;
+    --surface-2:#FAFAFA;
+    --surface-3:#F4F4F5;
+    --border:#E8E8EA;
+    --border-strong:#D4D4D8;
+    --border-faint:#F1F1F3;
+
+    --text:#09090B;
+    --text-2:#52525B;
+    --text-3:#A1A1AA;
+    --text-4:#D4D4D8;
+
+    --gold:#FFB422;
+    --gold-bright:#FFC547;
+    --gold-deep:#C97E00;
+    --gold-text:#946100;
+    --gold-subtle:rgba(255,180,34,0.10);
+    --gold-soft:rgba(255,180,34,0.20);
+    --gold-border:rgba(255,180,34,0.45);
+
+    --danger:#DC2626;
+    --success:#16A34A;
+
+    --sh-card:0 1px 2px rgba(0,0,0,0.04);
+    --sh-hover:0 8px 24px rgba(0,0,0,0.06);
+    --sh-pop:0 24px 48px rgba(0,0,0,0.08);
+    --sh-gold:0 8px 20px rgba(255,180,34,0.32);
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sans-serif;
+    line-height:1.5;
+    font-feature-settings:'cv02','cv03','cv04','cv11','ss01';
+    min-height:100vh;
+    padding-bottom:88px;
+    font-weight:400;
+    letter-spacing:-0.005em;
+  }
+  .num{font-variant-numeric:tabular-nums;font-feature-settings:'tnum'}
+
+  .wrap{max-width:1180px;margin:0 auto;padding:24px 24px 0}
+
+  /* ========== TOPBAR ========== */
+  .topbar{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:8px 0 24px;border-bottom:1px solid var(--border-faint);
+    margin-bottom:64px;
+  }
+  .brand{display:flex;align-items:center;gap:10px}
+  .logo-mark{
+    width:24px;height:24px;border-radius:6px;
+    background:var(--text);
+    position:relative;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .logo-mark::after{
+    content:"";width:8px;height:8px;border-radius:50%;
+    background:var(--gold);
+  }
+  .brand-name{
+    font-size:16px;font-weight:600;
+    letter-spacing:-0.015em;color:var(--text);
+  }
+  .brand-name span{color:var(--text-3);font-weight:400}
+
+  .topbar-right{display:flex;gap:8px;align-items:center}
+  .badge-live{
+    display:inline-flex;align-items:center;gap:6px;
+    font-size:11px;font-weight:500;letter-spacing:0.02em;
+    color:var(--text-2);padding:6px 10px;
+    background:var(--surface-2);border:1px solid var(--border);
+    border-radius:24px;
+  }
+  .badge-live .dot{
+    width:6px;height:6px;border-radius:50%;background:var(--success);
+    box-shadow:0 0 0 3px rgba(22,163,74,0.18);
+  }
+  .btn-ghost{
+    background:transparent;border:1px solid var(--border);
+    color:var(--text-2);padding:7px 14px;border-radius:8px;
+    font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;
+    transition:all .15s;
+  }
+  .btn-ghost:hover{background:var(--surface-2);color:var(--text);border-color:var(--border-strong)}
+
+  /* ========== HERO ========== */
+  .hero{
+    margin-bottom:80px;
+    padding:32px 0 0;
+  }
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:8px;
+    font-size:12px;font-weight:500;letter-spacing:0.04em;
+    color:var(--text-2);margin-bottom:24px;
+  }
+  .eyebrow .dash{
+    width:16px;height:1px;background:var(--gold);
+  }
+  h1.hero-h{
+    font-size:64px;
+    line-height:1.04;
+    font-weight:600;
+    letter-spacing:-0.04em;
+    color:var(--text);
+    margin-bottom:24px;
+    max-width:920px;
+  }
+  h1.hero-h .accent{
+    color:var(--gold-deep);
+    position:relative;
+    white-space:nowrap;
+  }
+  .hero-lead{
+    font-size:18px;
+    color:var(--text-2);
+    line-height:1.55;
+    max-width:620px;
+    font-weight:400;
+  }
+
+  /* PULSE STRIP */
+  .pulse-strip{
+    margin-top:48px;
+    background:var(--text);color:#fff;
+    border-radius:16px;padding:28px 32px;
+    display:grid;grid-template-columns:1fr auto 1fr 1fr 1fr;
+    gap:32px;align-items:center;
+  }
+  .ps-pulse{display:flex;align-items:center;gap:20px}
+  .ps-ring{position:relative;width:64px;height:64px;flex-shrink:0}
+  .ps-ring svg{transform:rotate(-90deg)}
+  .ps-ring-bg{fill:none;stroke:rgba(255,255,255,0.10);stroke-width:5}
+  .ps-ring-fg{fill:none;stroke:var(--gold);stroke-width:5;stroke-linecap:round;transition:stroke-dashoffset 1s cubic-bezier(0.22,1,0.36,1)}
+  .ps-ring-num{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:18px;font-weight:600;color:#fff;font-variant-numeric:tabular-nums}
+  .ps-pulse-meta .ps-l{font-size:11px;letter-spacing:0.08em;color:rgba(255,255,255,0.5);text-transform:uppercase;font-weight:500;margin-bottom:2px}
+  .ps-pulse-meta .ps-v{font-size:18px;font-weight:600;color:#fff;letter-spacing:-0.015em}
+  .ps-divider{width:1px;height:40px;background:rgba(255,255,255,0.10)}
+  .ps-cell .ps-l{font-size:11px;letter-spacing:0.08em;color:rgba(255,255,255,0.5);text-transform:uppercase;font-weight:500;margin-bottom:4px}
+  .ps-cell .ps-v{font-size:24px;font-weight:600;color:#fff;font-variant-numeric:tabular-nums;letter-spacing:-0.025em}
+  .ps-cell .ps-v.gold{color:var(--gold-bright)}
+  .ps-cell .ps-v.neg{color:#FCA5A5}
+
+  /* ========== SECTIONS ========== */
+  .sec{margin-bottom:80px}
+  .sec-h{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:24px;flex-wrap:wrap;gap:8px}
+  .sec-h h2{font-size:28px;font-weight:600;color:var(--text);letter-spacing:-0.02em;line-height:1.15}
+  .sec-h .sec-sub{font-size:14px;color:var(--text-3);font-weight:400}
+
+  /* ========== PRESETS ========== */
+  .presets-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .preset{
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:12px;padding:18px;
+    cursor:pointer;text-align:left;font-family:inherit;
+    transition:all .18s ease;position:relative;
+  }
+  .preset:hover{
+    border-color:var(--text);transform:translateY(-1px);
+    box-shadow:var(--sh-hover);
+  }
+  .preset-emoji{
+    width:32px;height:32px;border-radius:8px;
+    background:var(--surface-3);
+    display:flex;align-items:center;justify-content:center;
+    font-size:16px;margin-bottom:14px;
+  }
+  .preset-name{font-weight:600;font-size:14px;color:var(--text);margin-bottom:2px;letter-spacing:-0.01em}
+  .preset-desc{font-size:12px;color:var(--text-3);font-weight:400;font-variant-numeric:tabular-nums}
+
+  /* ========== DATA CARDS ========== */
+  .data-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .data-card{
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:14px;padding:24px;
+    transition:border-color .15s;
+  }
+  .data-card:hover{border-color:var(--border-strong)}
+  .dc-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;padding-bottom:14px;border-bottom:1px solid var(--border-faint)}
+  .dc-title{display:flex;align-items:center;gap:12px;min-width:0}
+  .dc-emoji{
+    width:32px;height:32px;border-radius:8px;
+    background:var(--surface-3);
+    display:flex;align-items:center;justify-content:center;
+    font-size:15px;flex-shrink:0;
+  }
+  .dc-name{font-size:14px;font-weight:600;color:var(--text);letter-spacing:-0.01em}
+  .dc-sub{font-size:12px;color:var(--text-3);margin-top:1px;font-weight:400}
+  .dc-total{text-align:right;flex-shrink:0}
+  .dc-total .lbl{font-size:10px;letter-spacing:0.10em;color:var(--text-3);text-transform:uppercase;font-weight:500;margin-bottom:2px}
+  .dc-total .v{
+    font-size:18px;font-weight:600;color:var(--text);
+    font-variant-numeric:tabular-nums;line-height:1;
+    letter-spacing:-0.02em;
+  }
+
+  /* ITEM ROWS */
+  .item{
+    display:grid;grid-template-columns:32px 1fr 100px 24px;
+    gap:8px;align-items:center;
+    padding:6px;border-radius:10px;margin-bottom:2px;
+    transition:background .12s;
+  }
+  .item:hover{background:var(--surface-2)}
+  .item-icon{
+    width:32px;height:32px;border-radius:8px;
+    background:var(--surface-3);
+    display:flex;align-items:center;justify-content:center;
+    font-size:15px;cursor:pointer;user-select:none;
+    transition:all .15s;
+  }
+  .item-icon:hover{background:var(--gold-soft);transform:scale(1.05)}
+  .item-name{
+    background:transparent;border:none;outline:none;
+    font-size:14px;color:var(--text);font-weight:500;
+    padding:6px 4px;font-family:inherit;width:100%;min-width:0;
+    border-bottom:1px solid transparent;transition:border .15s;
+    letter-spacing:-0.005em;
+  }
+  .item-name:focus{border-bottom-color:var(--gold)}
+  .item-amt-wrap{position:relative}
+  .item-amt{
+    background:transparent;border:1px solid transparent;
+    border-radius:6px;outline:none;
+    font-size:14px;color:var(--text);font-weight:600;
+    padding:6px 24px 6px 10px;font-family:inherit;width:100%;
+    text-align:right;font-variant-numeric:tabular-nums;
+    transition:all .15s;-moz-appearance:textfield;
+  }
+  .item-amt::-webkit-outer-spin-button,.item-amt::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  .item-amt:hover{background:var(--surface-2)}
+  .item-amt:focus{border-color:var(--gold);background:var(--surface)}
+  .item-suffix{
+    position:absolute;right:8px;top:50%;transform:translateY(-50%);
+    font-size:11px;color:var(--text-3);pointer-events:none;font-weight:500;
+  }
+  .item-rm{
+    background:transparent;border:none;color:var(--text-4);
+    cursor:pointer;font-size:16px;width:24px;height:24px;border-radius:6px;
+    transition:all .15s;display:flex;align-items:center;justify-content:center;
+  }
+  .item-rm:hover{background:rgba(220,38,38,0.10);color:var(--danger)}
+  .add-btn{
+    width:100%;background:transparent;
+    border:1px dashed var(--border-strong);color:var(--text-2);
+    padding:11px;border-radius:10px;
+    font-size:13px;font-weight:500;cursor:pointer;
+    margin-top:10px;transition:all .15s;font-family:inherit;
+    letter-spacing:-0.005em;
+  }
+  .add-btn:hover{border-color:var(--gold);color:var(--gold-deep);background:var(--gold-subtle);border-style:solid}
+
+  /* ========== MIRROR HERO ========== */
+  .mirror-hero{
+    background:var(--text);color:#fff;
+    border-radius:18px;
+    padding:36px 36px 32px;
+    position:relative;overflow:hidden;
+  }
+  .mirror-hero::before{
+    content:"";position:absolute;top:0;right:0;
+    width:380px;height:380px;
+    background:radial-gradient(circle,rgba(255,180,34,0.12),transparent 65%);
+    pointer-events:none;
+  }
+  .mh-head{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-bottom:24px;gap:16px;flex-wrap:wrap;position:relative;
+  }
+  .mh-title{display:flex;align-items:center;gap:14px}
+  .mh-icon{
+    width:42px;height:42px;border-radius:10px;
+    background:var(--gold);color:var(--text);
+    display:flex;align-items:center;justify-content:center;
+    font-size:18px;font-weight:700;
+  }
+  .mh-text-1{font-size:11px;font-weight:600;letter-spacing:0.12em;color:var(--gold-bright);text-transform:uppercase}
+  .mh-text-2{font-size:16px;font-weight:600;color:#fff;margin-top:2px;letter-spacing:-0.01em}
+  .mh-nav{display:flex;gap:6px;align-items:center}
+  .mh-nav-btn{
+    background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);
+    width:36px;height:36px;border-radius:50%;cursor:pointer;
+    font-size:16px;color:#fff;font-family:inherit;
+    transition:all .15s;display:flex;align-items:center;justify-content:center;
+  }
+  .mh-nav-btn:hover{background:var(--gold);border-color:var(--gold);color:var(--text)}
+  .mh-pager{
+    font-size:12px;color:rgba(255,255,255,0.5);font-weight:500;
+    min-width:38px;text-align:center;letter-spacing:0.04em;
+    font-variant-numeric:tabular-nums;
+  }
+  .mh-card{padding:8px 0 0;min-height:90px;position:relative}
+  .mh-tag{
+    display:inline-flex;align-items:center;gap:6px;
+    background:rgba(255,180,34,0.18);color:var(--gold-bright);
+    padding:4px 10px;border-radius:20px;
+    font-size:10px;letter-spacing:0.10em;text-transform:uppercase;font-weight:600;
+    margin-bottom:14px;
+  }
+  .mh-body{
+    font-size:20px;color:#fff;line-height:1.5;font-weight:400;
+    letter-spacing:-0.01em;
+  }
+  .mh-body b{color:var(--gold-bright);font-weight:600}
+
+  /* ========== MODULES ========== */
+  .modules-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .module-card{
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:14px;padding:22px;cursor:pointer;font-family:inherit;
+    text-align:left;transition:all .18s ease;position:relative;
+  }
+  .module-card:hover{border-color:var(--text);transform:translateY(-1px);box-shadow:var(--sh-hover)}
+  .module-card.expanded{
+    border-color:var(--text);box-shadow:var(--sh-pop);
+    grid-column:1/-1;cursor:default;transform:none;
+  }
+  .mc-h{display:flex;justify-content:space-between;align-items:flex-start;gap:14px}
+  .mc-emoji{
+    width:36px;height:36px;border-radius:8px;
+    background:var(--surface-3);
+    display:flex;align-items:center;justify-content:center;
+    font-size:16px;flex-shrink:0;transition:all .18s;
+  }
+  .module-card:hover .mc-emoji,.module-card.expanded .mc-emoji{background:var(--gold-soft)}
+  .mc-title-wrap{flex:1;min-width:0}
+  .mc-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:2px;letter-spacing:-0.01em}
+  .mc-desc{font-size:12px;color:var(--text-3);line-height:1.4;font-weight:400}
+  .mc-arrow{color:var(--text-3);font-size:12px;transition:transform .25s;flex-shrink:0;margin-top:6px}
+  .module-card.expanded .mc-arrow{transform:rotate(180deg);color:var(--text)}
+  .mc-content{display:none;margin-top:24px;padding-top:24px;border-top:1px solid var(--border)}
+  .module-card.expanded .mc-content{display:block;animation:expand .3s ease}
+  @keyframes expand{from{opacity:0}to{opacity:1}}
+
+  /* MODULE INNER */
+  .m-grid{display:grid;grid-template-columns:1fr 1.15fr;gap:24px}
+  .m-form{display:flex;flex-direction:column;gap:12px}
+  .m-field{display:flex;flex-direction:column;gap:6px}
+  .m-label{
+    font-size:11px;letter-spacing:0.06em;color:var(--text-2);
+    text-transform:uppercase;font-weight:500;
+    display:flex;align-items:center;gap:6px;
+  }
+  .m-label .info{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:14px;height:14px;border-radius:50%;
+    background:var(--surface-3);color:var(--text-3);
+    font-size:9px;font-weight:600;cursor:help;text-transform:none;
+  }
+  .m-input{
+    background:var(--surface);border:1px solid var(--border);border-radius:8px;
+    padding:11px 36px 11px 14px;font-size:15px;color:var(--text);font-weight:500;
+    font-family:inherit;width:100%;outline:none;
+    font-variant-numeric:tabular-nums;transition:all .15s;
+    -moz-appearance:textfield;letter-spacing:-0.005em;
+  }
+  .m-input::-webkit-outer-spin-button,.m-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  .m-input:hover{border-color:var(--border-strong)}
+  .m-input:focus{border-color:var(--text);box-shadow:0 0 0 3px rgba(0,0,0,0.04)}
+  .m-input-wrap{position:relative}
+  .m-input-suffix{
+    position:absolute;right:14px;top:50%;transform:translateY(-50%);
+    color:var(--text-3);font-size:13px;font-weight:500;pointer-events:none;
+  }
+
+  .m-result{display:flex;flex-direction:column;gap:14px}
+  .result-hero{
+    background:var(--text);color:#fff;
+    border-radius:14px;
+    padding:24px;text-align:center;
+  }
+  .rh-lbl{
+    font-size:11px;letter-spacing:0.10em;color:rgba(255,255,255,0.5);
+    text-transform:uppercase;font-weight:500;margin-bottom:8px;
+  }
+  .rh-v{
+    font-size:36px;font-weight:600;color:#fff;
+    font-variant-numeric:tabular-nums;line-height:1;letter-spacing:-0.03em;
+  }
+  .rh-v b{font-weight:600;color:var(--gold-bright)}
+  .rh-sub{font-size:13px;color:rgba(255,255,255,0.6);margin-top:8px;font-weight:400}
+
+  .progress-bar{height:4px;background:var(--surface-3);border-radius:4px;overflow:hidden}
+  .progress-fill{
+    height:100%;background:var(--gold);
+    border-radius:4px;transition:width 1s cubic-bezier(0.22,1,0.36,1);
+  }
+
+  .insight-card{
+    background:var(--surface-2);border:1px solid var(--border);
+    border-radius:10px;padding:14px 16px;
+    display:flex;gap:12px;align-items:flex-start;
+  }
+  .ic-emoji{
+    flex-shrink:0;width:28px;height:28px;border-radius:6px;
+    background:var(--surface);
+    display:flex;align-items:center;justify-content:center;font-size:14px;
+  }
+  .ic-body{font-size:13px;color:var(--text);line-height:1.55;font-weight:400}
+  .ic-body b{color:var(--gold-deep);font-weight:600}
+
+  .stat-mini-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .stat-mini{
+    background:var(--surface-2);border:1px solid var(--border);border-radius:10px;
+    padding:14px 12px;text-align:center;
+  }
+  .sm-l{font-size:9px;letter-spacing:0.10em;color:var(--text-3);text-transform:uppercase;font-weight:500;margin-bottom:4px}
+  .sm-v{font-size:18px;font-weight:600;color:var(--text);font-variant-numeric:tabular-nums;letter-spacing:-0.025em}
+  .sm-v.neg{color:var(--danger)}
+  .sm-v.pos{color:var(--success)}
+  .sm-sub{font-size:10px;color:var(--text-3);margin-top:2px;font-weight:400}
+
+  .chart-box{
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:12px;padding:16px;height:280px;position:relative;
+  }
+
+  /* SUBS */
+  .sub-item{
+    display:grid;grid-template-columns:32px 1fr 100px 80px 24px;
+    gap:8px;align-items:center;
+    padding:6px;border-radius:10px;margin-bottom:2px;
+    transition:background .12s;
+  }
+  .sub-item:hover{background:var(--surface-2)}
+  .sub-item.unused{background:rgba(220,38,38,0.04)}
+  .sub-toggle{
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;width:32px;height:32px;border-radius:8px;font-size:14px;
+    transition:all .15s;user-select:none;font-weight:700;
+  }
+  .sub-toggle.on{background:rgba(22,163,74,0.10);color:var(--success)}
+  .sub-toggle.off{background:rgba(220,38,38,0.10);color:var(--danger)}
+  .sub-yearly{
+    text-align:right;font-size:11px;color:var(--text-3);
+    font-variant-numeric:tabular-nums;font-weight:500;
+  }
+
+  /* TIME */
+  .time-row{
+    display:grid;grid-template-columns:1fr 90px 100px;
+    gap:12px;align-items:center;
+    padding:12px 14px;border-radius:10px;
+    background:var(--surface-2);margin-bottom:6px;border:1px solid var(--border);
+  }
+  .tr-name{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:500;color:var(--text)}
+  .tr-name .em{font-size:14px;width:26px;height:26px;border-radius:6px;background:var(--surface);display:inline-flex;align-items:center;justify-content:center}
+  .tr-amt{text-align:right;font-size:12px;color:var(--text-3);font-variant-numeric:tabular-nums;font-weight:500}
+  .tr-time{text-align:right;font-size:14px;font-weight:600;color:var(--gold-deep);font-variant-numeric:tabular-nums;letter-spacing:-0.01em}
+
+  /* CTA */
+  .cta-section{
+    margin-top:64px;
+    background:var(--text);color:#fff;
+    border-radius:18px;padding:48px 40px;
+    text-align:center;
+  }
+  .cta-section h3{
+    font-size:32px;font-weight:600;letter-spacing:-0.025em;
+    margin-bottom:12px;
+  }
+  .cta-section p{
+    font-size:15px;color:rgba(255,255,255,0.6);
+    margin-bottom:28px;max-width:480px;margin-left:auto;margin-right:auto;
+  }
+  .final-cta{
+    background:var(--gold);color:var(--text);
+    border:none;border-radius:10px;
+    padding:14px 28px;font-size:14px;font-weight:600;letter-spacing:-0.005em;
+    cursor:pointer;font-family:inherit;
+    transition:all .18s;
+  }
+  .final-cta:hover{background:var(--gold-bright);transform:translateY(-1px);box-shadow:var(--sh-gold)}
+
+  footer{
+    margin-top:48px;padding:24px 0;border-top:1px solid var(--border-faint);
+    text-align:center;color:var(--text-3);font-size:11px;
+    letter-spacing:0.10em;font-weight:500;
+  }
+
+  /* ========== STICKY BAR ========== */
+  .sticky-bar{
+    position:fixed;bottom:16px;left:50%;
+    background:rgba(9,9,11,0.94);backdrop-filter:blur(20px) saturate(180%);
+    -webkit-backdrop-filter:blur(20px) saturate(180%);
+    border:1px solid rgba(255,255,255,0.08);
+    color:#fff;
+    border-radius:100px;padding:10px 18px;
+    box-shadow:var(--sh-pop);
+    display:flex;align-items:center;gap:18px;
+    z-index:50;font-size:13px;
+    max-width:calc(100% - 32px);overflow:hidden;
+    font-weight:500;
+    transform:translate(-50%,140%);opacity:0;pointer-events:none;
+    transition:transform .35s cubic-bezier(0.22,1,0.36,1),opacity .25s ease;
+  }
+  .sticky-bar.show{transform:translate(-50%,0);opacity:1;pointer-events:auto}
+  .sticky-bar .sb-pulse{display:flex;align-items:center;gap:8px}
+  .sticky-bar .sb-dot{
+    width:8px;height:8px;border-radius:50%;background:var(--gold);
+    flex-shrink:0;
+  }
+  .sticky-bar b{color:#fff;font-weight:600;font-variant-numeric:tabular-nums;margin-left:6px;letter-spacing:-0.01em}
+  .sticky-bar .sb-divider{width:1px;height:14px;background:rgba(255,255,255,0.12)}
+  .sticky-bar span{color:rgba(255,255,255,0.6)}
+
+  /* TOOLTIP */
+  [data-tip]{position:relative}
+  [data-tip]:hover::after{
+    content:attr(data-tip);position:absolute;bottom:130%;left:50%;
+    transform:translateX(-50%);background:var(--text);color:#fff;
+    padding:6px 10px;border-radius:6px;font-size:11px;font-weight:500;
+    white-space:nowrap;z-index:100;
+    text-transform:none;letter-spacing:0;
+  }
+
+  @keyframes fadeUp{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+  .fadeUp{animation:fadeUp .35s ease both}
+
+  /* RESPONSIVE */
+  @media(max-width:980px){
+    .wrap{padding:16px 16px 0}
+    h1.hero-h{font-size:42px;letter-spacing:-0.035em}
+    .hero{padding-top:16px;margin-bottom:48px}
+    .pulse-strip{grid-template-columns:1fr 1fr;gap:20px;padding:24px}
+    .ps-divider{display:none}
+    .presets-grid{grid-template-columns:repeat(2,1fr)}
+    .data-grid{grid-template-columns:1fr}
+    .modules-grid{grid-template-columns:1fr}
+    .m-grid{grid-template-columns:1fr}
+    .sec-h h2{font-size:24px}
+    .mh-body{font-size:17px}
+    .cta-section{padding:36px 24px}
+    .cta-section h3{font-size:24px}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="brand">
+      <div class="logo-mark"></div>
+      <div class="brand-name">FinPulse <span>· Calculator</span></div>
+    </div>
+    <div class="topbar-right">
+      <span class="badge-live"><span class="dot"></span>Live demo</span>
+      <button class="btn-ghost" onclick="resetAll()">↺ Reset</button>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="eyebrow"><span class="dash"></span>Lifestyle Mirror AI</div>
+    <h1 class="hero-h">Финансы, которые <span class="accent">понимают тебя</span>.</h1>
+    <p class="hero-lead">Не очередной учёт расходов. AI-зеркало, которое видит, как ты живёшь — через то, на что ты тратишь деньги. Заполни шаблон или впиши свои цифры за 30 секунд.</p>
+
+    <!-- PULSE STRIP -->
+    <div class="pulse-strip">
+      <div class="ps-pulse">
+        <div class="ps-ring">
+          <svg width="64" height="64" viewBox="0 0 64 64">
+            <circle class="ps-ring-bg" cx="32" cy="32" r="26"/>
+            <circle class="ps-ring-fg" cx="32" cy="32" r="26" id="gauge-fg"
+              stroke-dasharray="163" stroke-dashoffset="163"/>
+          </svg>
+          <div class="ps-ring-num" id="pulse-num">—</div>
+        </div>
+        <div class="ps-pulse-meta">
+          <div class="ps-l">Финансовый пульс</div>
+          <div class="ps-v" id="pulse-status">Заполни данные</div>
+        </div>
+      </div>
+      <div class="ps-divider"></div>
+      <div class="ps-cell">
+        <div class="ps-l">Остаток</div>
+        <div class="ps-v gold" id="k-balance">—</div>
+      </div>
+      <div class="ps-cell">
+        <div class="ps-l">Норма сбережений</div>
+        <div class="ps-v" id="k-rate">—</div>
+      </div>
+      <div class="ps-cell">
+        <div class="ps-l">За год</div>
+        <div class="ps-v" id="k-year">—</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRESETS -->
+  <section class="sec">
+    <div class="sec-h">
+      <h2>Быстрый старт</h2>
+      <div class="sec-sub">Выбери похожий профиль — данные подставятся автоматически</div>
+    </div>
+    <div class="presets-grid">
+      <button class="preset" data-preset="student">
+        <div class="preset-emoji">🎓</div>
+        <div class="preset-name">Студент</div>
+        <div class="preset-desc">Доход ~30 000 ₽</div>
+      </button>
+      <button class="preset" data-preset="spec">
+        <div class="preset-emoji">💼</div>
+        <div class="preset-name">Специалист</div>
+        <div class="preset-desc">Доход ~95 000 ₽</div>
+      </button>
+      <button class="preset" data-preset="family">
+        <div class="preset-emoji">👨‍👩‍👧</div>
+        <div class="preset-name">Семья</div>
+        <div class="preset-desc">Доход ~200 000 ₽</div>
+      </button>
+      <button class="preset" data-preset="top">
+        <div class="preset-emoji">💎</div>
+        <div class="preset-name">Топ-менеджер</div>
+        <div class="preset-desc">Доход ~400 000 ₽</div>
+      </button>
+    </div>
+  </section>
+
+  <!-- DATA -->
+  <section class="sec">
+    <div class="sec-h">
+      <h2>Твои деньги</h2>
+      <div class="sec-sub">Кликни иконку, чтобы сменить · впиши свои цифры</div>
+    </div>
+    <div class="data-grid">
+      <div class="data-card">
+        <div class="dc-head">
+          <div class="dc-title">
+            <div class="dc-emoji">↗</div>
+            <div>
+              <div class="dc-name">Источники дохода</div>
+              <div class="dc-sub">Зарплата, фриланс, инвестиции</div>
+            </div>
+          </div>
+          <div class="dc-total">
+            <div class="lbl">Всего</div>
+            <div class="v" id="income-total">—</div>
+          </div>
+        </div>
+        <div id="sources-list"></div>
+        <button class="add-btn" id="add-source">＋ Добавить источник</button>
+      </div>
+
+      <div class="data-card">
+        <div class="dc-head">
+          <div class="dc-title">
+            <div class="dc-emoji">↘</div>
+            <div>
+              <div class="dc-name">Расходы по категориям</div>
+              <div class="dc-sub">Что и сколько съедает в месяц</div>
+            </div>
+          </div>
+          <div class="dc-total">
+            <div class="lbl">Всего</div>
+            <div class="v" id="expense-total">—</div>
+          </div>
+        </div>
+        <div id="expenses-list"></div>
+        <button class="add-btn" id="add-expense">＋ Добавить категорию</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- MIRROR -->
+  <section class="sec">
+    <div class="mirror-hero">
+      <div class="mh-head">
+        <div class="mh-title">
+          <div class="mh-icon">🪞</div>
+          <div>
+            <div class="mh-text-1">Lifestyle Mirror</div>
+            <div class="mh-text-2">AI-зеркало твоей жизни</div>
+          </div>
+        </div>
+        <div class="mh-nav">
+          <button class="mh-nav-btn" id="mh-prev">‹</button>
+          <span class="mh-pager" id="mh-pager">1/3</span>
+          <button class="mh-nav-btn" id="mh-next">›</button>
+        </div>
+      </div>
+      <div class="mh-card" id="mh-card">
+        <div class="mh-tag" id="mh-tag">Совет</div>
+        <div class="mh-body" id="mh-body">Заполни данные — и AI покажет, на что ты тратишь не только деньги, но и свою жизнь.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODULES -->
+  <section class="sec">
+    <div class="sec-h">
+      <h2>Что ещё умеет FinPulse</h2>
+      <div class="sec-sub">Кликни карточку — данные подтянутся автоматически</div>
+    </div>
+
+    <div class="modules-grid">
+      <button class="module-card" data-module="goal">
+        <div class="mc-h">
+          <div class="mc-emoji">🎯</div>
+          <div class="mc-title-wrap">
+            <div class="mc-title">Цели накоплений</div>
+            <div class="mc-desc">Сколько откладывать на мечту</div>
+          </div>
+          <div class="mc-arrow">▾</div>
+        </div>
+        <div class="mc-content">
+          <div class="m-grid">
+            <div class="m-form">
+              <div class="m-field">
+                <span class="m-label">Цель</span>
+                <input class="m-input" type="text" id="goal-name" value="Отпуск" style="text-align:left">
+              </div>
+              <div class="m-field">
+                <span class="m-label">Сумма цели</span>
+                <div class="m-input-wrap">
+                  <input class="m-input" type="number" id="goal-amount" value="300000" min="0" step="10000">
+                  <span class="m-input-suffix">₽</span>
+                </div>
+              </div>
+              <div class="m-field">
+                <span class="m-label">Уже накоплено</span>
+                <div class="m-input-wrap">
+                  <input class="m-input" type="number" id="goal-saved" value="50000" min="0" step="5000">
+                  <span class="m-input-suffix">₽</span>
+                </div>
+              </div>
+              <div class="m-field">
+                <span class="m-label">Срок (месяцев)</span>
+                <div class="m-input-wrap">
+                  <input class="m-input" type="number" id="goal-months" value="12" min="1" max="240" step="1">
+                  <span class="m-input-suffix">мес</span>
+                </div>
+              </div>
+            </div>
+            <div class="m-result">
+              <div class="result-hero">
+                <div class="rh-lbl">Откладывать в месяц</div>
+                <div class="rh-v"><b id="goal-monthly">—</b></div>
+                <div class="rh-sub" id="goal-progress-text">—</div>
+                <div class="progress-bar" style="margin-top:14px"><div class="progress-fill" id="goal-progress-bar" style="width:0%"></div></div>
+              </div>
+              <div class="stat-mini-row">
+                <div class="stat-mini"><div class="sm-l">Осталось</div><div class="sm-v" id="goal-remaining">—</div></div>
+                <div class="stat-mini"><div class="sm-l">Прогресс</div><div class="sm-v" id="goal-percent">—</div></div>
+                <div class="stat-mini"><div class="sm-l">К дате</div><div class="sm-v" id="goal-date" style="font-size:13px">—</div></div>
+              </div>
+              <div class="insight-card">
+                <div class="ic-emoji">🪞</div>
+                <div class="ic-body" id="goal-mirror">Lifestyle Mirror покажет реалистичность цели после ввода данных.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </button>
+
+      <button class="module-card" data-module="loan">
+        <div class="mc-h">
+          <div class="mc-emoji">🏦</div>
+          <div class="mc-title-wrap">
+            <div class="mc-title">Расчёт кредита</div>
+            <div class="mc-desc">Платёж + честная альтернатива</div>
+          </div>
+          <div class="mc-arrow">▾</div>
+        </div>
+        <div class="mc-content">
+          <div class="m-grid">
+            <div class="m-form">
+              <div class="m-field">
+                <span class="m-label">Сумма кредита</span>
+                <div class="m-input-wrap">
+                  <input class="m-input" type="number" id="loan-amount" value="500000" min="0" step="10000">
+                  <span class="m-input-suffix">₽</span>
+                </div>
+              </div>
+              <div class="m-field">
+                <span class="m-label">Ставка % годовых</span>
+                <div class="m-input-wrap">
+                  <input class="m-input" type="number" id="loan-rate" value="22" min="0" max="100" step="0.1">
+                  <span class="m-input-suffix">%</span>
+                </div>
+              </div>
+              <div class="m-field">
+                <span class="m-label">Срок (месяцев)</span>
+                <div class="m-input-wrap">
+                  <input class="m-input" type="number" id="loan-months" value="36" min="1" max="360" step="1">
+                  <span class="m-input-suffix">мес</span>
+                </div>
+              </div>
+            </div>
+            <div class="m-result">
+              <div class="result-hero">
+                <div class="rh-lbl">Ежемесячный платёж</div>
+                <div class="rh-v"><b id="loan-monthly">—</b></div>
+                <div class="rh-sub" id="loan-info">—</div>
+              </div>
+              <div class="stat-mini-row">
+                <div class="stat-mini"><div class="sm-l">Переплата</div><div class="sm-v neg" id="loan-overpay">—</div><div class="sm-sub" id="loan-overpay-pct">—</div></div>
+                <div class="stat-mini"><div class="sm-l">Всего вернёшь</div><div class="sm-v" id="loan-total">—</div><div class="sm-sub">с %</div></div>
+                <div class="stat-mini"><div class="sm-l">Срок</div><div class="sm-v" id="loan-years" style="font-size:14px">—</div><div class="sm-sub">в годах</div></div>
+              </div>
+              <div class="insight-card">
+                <div class="ic-emoji">💎</div>
+                <div class="ic-body" id="loan-alt">Альтернатива «копить вместо брать» появится после ввода суммы.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </button>
+
+      <button class="module-card" data-module="forecast">
+        <div class="mc-h">
+          <div class="mc-emoji">📈</div>
+          <div class="mc-title-wrap">
+            <div class="mc-title">Прогноз капитала</div>
+            <div class="mc-desc">График роста сложных процентов</div>
+          </div>
+          <div class="mc-arrow">▾</div>
+        </div>
+        <div class="mc-content">
+          <div class="m-grid">
+            <div class="m-form">
+              <div class="m-field">
+                <span class="m-label">Стартовая сумма</span>
+                <div class="m-input-wrap">
+                  <input class="m-input" type="number" id="fc-start" value="50000" min="0" step="10000">
+                  <span class="m-input-suffix">₽</span>
+                </div>
+              </div>
+              <div class="m-field">
+                <span class="m-label">Откладывать в месяц <span class="info" data-tip="Из остатка">i</span></span>
+                <div class="m-input-wrap">
+                  <input class="m-input" type="number" id="fc-monthly" value="20000" min="0" step="1000">
+                  <span class="m-input-suffix">₽</span>
+                </div>
+              </div>
+              <div class="m-field">
+                <span class="m-label">Доходность годовых <span class="info" data-tip="12% депозит, 15% ETF, 20% акции">i</span></span>
+                <div class="m-input-wrap">
+                  <input class="m-input" type="number" id="fc-rate" value="12" min="0" max="50" step="0.5">
+                  <span class="m-input-suffix">%</span>
+                </div>
+              </div>
+              <div class="m-field">
+                <span class="m-label">Период (лет)</span>
+                <div class="m-input-wrap">
+                  <input class="m-input" type="number" id="fc-years" value="5" min="1" max="20" step="1">
+                  <span class="m-input-suffix">лет</span>
+                </div>
+              </div>
+            </div>
+            <div class="m-result">
+              <div class="stat-mini-row">
+                <div class="stat-mini"><div class="sm-l">Итог</div><div class="sm-v" id="fc-final">—</div></div>
+                <div class="stat-mini"><div class="sm-l">Вложил</div><div class="sm-v" id="fc-invested" style="color:var(--text-2)">—</div></div>
+                <div class="stat-mini"><div class="sm-l">Заработал</div><div class="sm-v pos" id="fc-profit">—</div></div>
+              </div>
+              <div class="chart-box"><canvas id="fc-chart"></canvas></div>
+              <div class="insight-card">
+                <div class="ic-emoji">🪞</div>
+                <div class="ic-body" id="fc-mirror">—</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </button>
+
+      <button class="module-card" data-module="subs">
+        <div class="mc-h">
+          <div class="mc-emoji">📱</div>
+          <div class="mc-title-wrap">
+            <div class="mc-title">Анализ подписок</div>
+            <div class="mc-desc">Сколько в год · что не используешь</div>
+          </div>
+          <div class="mc-arrow">▾</div>
+        </div>
+        <div class="mc-content">
+          <div class="m-grid">
+            <div class="m-form">
+              <div id="subs-list"></div>
+              <button class="add-btn" id="add-sub">＋ Добавить подписку</button>
+              <div class="insight-card" style="margin-top:6px">
+                <div class="ic-emoji">💡</div>
+                <div class="ic-body">Кликни ✓ или ✗ слева — отметь, используешь подписку или нет.</div>
+              </div>
+            </div>
+            <div class="m-result">
+              <div class="result-hero">
+                <div class="rh-lbl">В год на подписки</div>
+                <div class="rh-v"><b id="subs-year">—</b></div>
+                <div class="rh-sub" id="subs-month-info">—</div>
+              </div>
+              <div class="stat-mini-row">
+                <div class="stat-mini"><div class="sm-l">Активных</div><div class="sm-v" id="subs-active">—</div></div>
+                <div class="stat-mini"><div class="sm-l">Не нужны</div><div class="sm-v neg" id="subs-unused">—</div></div>
+                <div class="stat-mini"><div class="sm-l">Сэкономишь</div><div class="sm-v pos" id="subs-saved">—</div></div>
+              </div>
+              <div class="insight-card">
+                <div class="ic-emoji">🪞</div>
+                <div class="ic-body" id="subs-mirror">—</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </button>
+
+      <button class="module-card" data-module="time">
+        <div class="mc-h">
+          <div class="mc-emoji">⏱</div>
+          <div class="mc-title-wrap">
+            <div class="mc-title">Время на работу</div>
+            <div class="mc-desc">Каждая трата — в часах жизни</div>
+          </div>
+          <div class="mc-arrow">▾</div>
+        </div>
+        <div class="mc-content">
+          <div class="m-grid">
+            <div class="m-form">
+              <div class="m-field">
+                <span class="m-label">Ставка в час <span class="info" data-tip="Доход ÷ часы работы">i</span></span>
+                <div class="m-input-wrap">
+                  <input class="m-input" type="number" id="time-rate" value="565" min="0" step="10">
+                  <span class="m-input-suffix">₽/ч</span>
+                </div>
+              </div>
+              <div class="m-field">
+                <span class="m-label">Часов работы в месяц</span>
+                <div class="m-input-wrap">
+                  <input class="m-input" type="number" id="time-hours" value="168" min="1" max="500" step="1">
+                  <span class="m-input-suffix">ч</span>
+                </div>
+              </div>
+              <div class="insight-card" style="margin-top:6px">
+                <div class="ic-emoji">⏰</div>
+                <div class="ic-body">Каждая категория — в часах твоей жизни. Это другой взгляд на траты.</div>
+              </div>
+            </div>
+            <div class="m-result">
+              <div id="time-list"></div>
+              <div class="insight-card">
+                <div class="ic-emoji">🪞</div>
+                <div class="ic-body" id="time-mirror">—</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </button>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <div class="cta-section">
+    <h3>Скоро в App Store</h3>
+    <p>FinPulse — единственный PFM в СНГ с AI Lifestyle Mirror. Подпишись и получи ранний доступ + 6 месяцев Pro бесплатно.</p>
+    <button class="final-cta" onclick="alert('Скоро будет доступно!')">Получить ранний доступ</button>
+  </div>
+
+  <footer>FINPULSE · CALCULATOR DEMO · 2026</footer>
+</div>
+
+<!-- STICKY -->
+<div class="sticky-bar" id="sticky">
+  <div class="sb-pulse"><div class="sb-dot" id="sb-dot"></div><span>Пульс<b id="sb-pulse">—</b></span></div>
+  <div class="sb-divider"></div>
+  <div><span>Остаток</span><b id="sb-balance">—</b></div>
+  <div class="sb-divider"></div>
+  <div><span>За год</span><b id="sb-year">—</b></div>
+</div>
+
+<script>
+  const fmt = n => {
+    const v = Math.round(n);
+    const abs = Math.abs(v);
+    if(abs >= 1000000) return (v/1000000).toFixed(abs>=10000000?0:1).replace('.0','') + ' млн ₽';
+    return v.toLocaleString('ru-RU') + ' ₽';
+  };
+
+  const INCOME_ICONS = ['💼','🎨','📈','🏠','🛍','💎','🎁','🚀','🏛','💰','📚','🎵'];
+  const EXPENSE_ICONS = ['🏠','🍽','🥡','🚕','☕','🎬','📱','💊','👕','🎓','🐾','🏋','✈','💄','🎁','🛒','⛽','🎮','💻','🚌','🍷','🌸','🛀','📚'];
+
+  let sources = [];
+  let expenses = [];
+  let nextId = 200;
+
+  const PRESETS = {
+    student: {
+      sources:[{icon:'🎓',name:'Стипендия',amount:5000},{icon:'💼',name:'Подработка',amount:25000}],
+      expenses:[
+        {key:'rent',icon:'🏠',name:'Жильё',amount:8000},
+        {key:'food',icon:'🍽',name:'Продукты',amount:8000},
+        {key:'delivery',icon:'🥡',name:'Доставка/кафе',amount:4000},
+        {key:'taxi',icon:'🚌',name:'Транспорт',amount:2000},
+        {key:'coffee',icon:'☕',name:'Кофе',amount:2500},
+        {key:'fun',icon:'🎮',name:'Развлечения',amount:3000},
+        {key:'subs',icon:'📱',name:'Подписки',amount:1000}
+      ]
+    },
+    spec: {
+      sources:[{icon:'💼',name:'Зарплата',amount:80000},{icon:'🎨',name:'Фриланс',amount:15000}],
+      expenses:[
+        {key:'rent',icon:'🏠',name:'Жильё и коммуналка',amount:25000},
+        {key:'food',icon:'🍽',name:'Еда дома',amount:12000},
+        {key:'delivery',icon:'🥡',name:'Доставка и кафе',amount:10000},
+        {key:'taxi',icon:'🚕',name:'Такси и транспорт',amount:8000},
+        {key:'coffee',icon:'☕',name:'Кофейни',amount:3000},
+        {key:'fun',icon:'🎬',name:'Развлечения',amount:5000},
+        {key:'subs',icon:'📱',name:'Подписки',amount:2500},
+        {key:'other',icon:'🛒',name:'Прочее',amount:5000}
+      ]
+    },
+    family: {
+      sources:[{icon:'💼',name:'Зарплата (один)',amount:120000},{icon:'💼',name:'Зарплата (два)',amount:80000}],
+      expenses:[
+        {key:'rent',icon:'🏠',name:'Ипотека и коммуналка',amount:55000},
+        {key:'food',icon:'🍽',name:'Продукты на семью',amount:35000},
+        {key:'delivery',icon:'🥡',name:'Кафе и доставка',amount:12000},
+        {key:'taxi',icon:'🚕',name:'Транспорт',amount:10000},
+        {key:'fun',icon:'🎬',name:'Развлечения',amount:15000},
+        {key:'subs',icon:'📱',name:'Подписки',amount:3500},
+        {key:'other',icon:'🍼',name:'Дети',amount:25000},
+        {key:'other',icon:'💊',name:'Здоровье',amount:8000}
+      ]
+    },
+    top: {
+      sources:[{icon:'💎',name:'Зарплата + бонусы',amount:350000},{icon:'📈',name:'Дивиденды',amount:50000}],
+      expenses:[
+        {key:'rent',icon:'🏠',name:'Жильё (премиум)',amount:80000},
+        {key:'food',icon:'🍽',name:'Продукты',amount:25000},
+        {key:'delivery',icon:'🍷',name:'Рестораны',amount:35000},
+        {key:'taxi',icon:'🚕',name:'Такси / каршеринг',amount:18000},
+        {key:'fun',icon:'✈',name:'Путешествия',amount:30000},
+        {key:'subs',icon:'📱',name:'Подписки',amount:6000},
+        {key:'other',icon:'💄',name:'Стиль и услуги',amount:25000},
+        {key:'other',icon:'💎',name:'Премиум',amount:20000}
+      ]
+    }
+  };
+
+  function applyPreset(key){
+    const p = PRESETS[key];
+    sources = p.sources.map(s => ({id:nextId++, ...s}));
+    expenses = p.expenses.map(e => ({id:nextId++, ...e}));
+    renderAll(); update();
+  }
+
+  function renderList(items, listId, iconSet){
+    const list = document.getElementById(listId);
+    if(!list) return;
+    if(items.length === 0){
+      list.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text-3);font-size:13px">Пусто — добавь первую запись ниже</div>';
+      return;
+    }
+    list.innerHTML = '';
+    items.forEach(s => {
+      const row = document.createElement('div');
+      row.className = 'item';
+      row.innerHTML = `
+        <div class="item-icon" data-id="${s.id}" data-tip="Кликни — сменить">${s.icon}</div>
+        <input class="item-name" type="text" value="${s.name.replace(/"/g,'&quot;')}" data-id="${s.id}" placeholder="Название">
+        <div class="item-amt-wrap">
+          <input class="item-amt" type="number" value="${s.amount}" min="0" step="500" data-id="${s.id}">
+          <span class="item-suffix">₽</span>
+        </div>
+        <button class="item-rm" data-id="${s.id}" data-tip="Удалить">×</button>
+      `;
+      list.appendChild(row);
+    });
+    list.querySelectorAll('.item-amt').forEach(inp => inp.addEventListener('input', e => {
+      const id = +e.target.dataset.id;
+      const item = items.find(x => x.id === id);
+      if(item){ item.amount = Math.max(0, +e.target.value || 0); update(); }
+    }));
+    list.querySelectorAll('.item-name').forEach(inp => inp.addEventListener('input', e => {
+      const id = +e.target.dataset.id;
+      const item = items.find(x => x.id === id);
+      if(item) item.name = e.target.value;
+    }));
+    list.querySelectorAll('.item-rm').forEach(btn => btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const id = +e.target.dataset.id;
+      const idx = items.findIndex(x => x.id === id);
+      if(idx >= 0) items.splice(idx, 1);
+      renderAll(); update();
+    }));
+    list.querySelectorAll('.item-icon').forEach(el => el.addEventListener('click', e => {
+      const id = +e.target.dataset.id;
+      const item = items.find(x => x.id === id);
+      if(!item) return;
+      const idx = iconSet.indexOf(item.icon);
+      item.icon = iconSet[(idx+1) % iconSet.length];
+      renderAll();
+    }));
+  }
+  function renderAll(){
+    renderList(sources, 'sources-list', INCOME_ICONS);
+    renderList(expenses, 'expenses-list', EXPENSE_ICONS);
+  }
+  document.getElementById('add-source').addEventListener('click', () => {
+    sources.push({id: nextId++, icon: '💰', name: 'Новый источник', amount: 0});
+    renderAll(); update();
+  });
+  document.getElementById('add-expense').addEventListener('click', () => {
+    expenses.push({id: nextId++, key:'custom', icon: '🛒', name: 'Новая категория', amount: 0});
+    renderAll(); update();
+  });
+
+  document.querySelectorAll('.preset').forEach(b => b.addEventListener('click', () => {
+    applyPreset(b.dataset.preset);
+    document.querySelector('.data-grid').scrollIntoView({behavior:'smooth', block:'start'});
+  }));
+
+  function resetAll(){
+    if(!confirm('Сбросить все данные?')) return;
+    applyPreset('spec');
+  }
+
+  function calcPulse(income, total, e){
+    if(income <= 0) return 0;
+    const balance = income - total;
+    const saveRate = balance/income;
+    let score = 50;
+    score += Math.max(-30, Math.min(35, saveRate * 90));
+    if(balance < 0) score -= 25;
+    if((e.fun||0) > 1500) score += 5;
+    const lifestyleStress = ((e.delivery||0) + (e.coffee||0)) / income;
+    if(lifestyleStress > 0.18) score -= 8;
+    return Math.max(1, Math.min(100, Math.round(score)));
+  }
+  function statusText(p){
+    if(p>=85) return 'Отличный пульс';
+    if(p>=70) return 'Здоровый ритм';
+    if(p>=55) return 'Стабильно';
+    if(p>=40) return 'Требует внимания';
+    if(p>=25) return 'Аритмия трат';
+    return 'Нужен план';
+  }
+
+  let mirrorCards = [];
+  let mirrorIdx = 0;
+  function generateMirrors(income, e){
+    const taxi=e.taxi||0, delivery=e.delivery||0, coffee=e.coffee||0, fun=e.fun||0, food=e.food||0, subs=e.subs||0;
+    const total = Object.values(e).reduce((a,b)=>a+b,0);
+    const balance = income - total;
+    const cards = [];
+    const sedentary = taxi + delivery;
+    if(sedentary > 12000){
+      const save = Math.round(sedentary * 0.3);
+      cards.push({tag:'Здоровье', body:`Ты тратишь <b>${fmt(sedentary)}</b> на такси и доставку — это сидячий ритм жизни. Зал стоит <b>${fmt(2500)}</b>, ходьба и готовка дома освободят <b>~${fmt(save)}</b> в месяц и улучшат самочувствие.`});
+    }
+    if(coffee > 4000){
+      const meets = Math.round(coffee / 800);
+      cards.push({tag:'Время', body:`Кофейни — <b>${fmt(coffee)}</b>. Это <b>${meets} встреч</b> с друзьями в месяц. Может, тебе нужны не сами кофейни, а живое общение в новых местах.`});
+    }
+    if(fun < 2000 && income > 40000){
+      const pct = Math.round((fun/income)*100);
+      cards.push({tag:'Эмоции', body:`На радость и хобби — всего <b>${fmt(fun)} (${pct}%)</b>. Большая часть бюджета уходит на обязательное. Подумай, сколько в твоей жизни сейчас удовольствия — а не только обязательств.`});
+    }
+    if(balance > income*0.25){
+      const yearSave = balance*12;
+      cards.push({tag:'Будущее', body:`Ты откладываешь <b>${Math.round((balance/income)*100)}%</b> дохода — это сильно выше нормы. За год это <b>${fmt(yearSave)}</b>. Подумай не только о подушке, но и о том, как использовать деньги для жизни, которую хочешь.`});
+    }
+    if(delivery > food && delivery > 6000){
+      cards.push({tag:'Паттерн', body:`Доставка <b>${fmt(delivery)}</b> больше, чем продукты <b>${fmt(food)}</b>. Часто это — <b>стресс-паттерн</b>: устал → заказал. Готовка 3 раза в неделю освободит <b>~${fmt(delivery*0.4)}</b>.`});
+    }
+    if(subs > 3000){
+      cards.push({tag:'Подписки', body:`<b>${fmt(subs)}/мес</b> на подписки = <b>${fmt(subs*12)}/год</b>. Половину обычно не используют. Открой модуль «Подписки» — почистим вместе.`});
+    }
+    if(balance < 0){
+      cards.push({tag:'Срочно', body:`Минус <b>${fmt(Math.abs(balance))}</b> в месяц — твои привычки опережают доход. Самый честный шаг: сократить одну категорию на 25%, а не урезать всё сразу.`});
+    }
+    if(cards.length === 0){
+      cards.push({tag:'Баланс', body:`Твой бюджет сбалансирован: на жизнь, удовольствие и накопления. Это <b>здоровый ритм</b> — то, ради чего и существует FinPulse.`});
+    }
+    return cards.slice(0, 4);
+  }
+  function renderMirror(){
+    if(mirrorCards.length === 0) return;
+    const card = mirrorCards[mirrorIdx];
+    document.getElementById('mh-tag').textContent = card.tag;
+    document.getElementById('mh-body').innerHTML = card.body;
+    document.getElementById('mh-pager').textContent = `${mirrorIdx+1} / ${mirrorCards.length}`;
+    const cardEl = document.getElementById('mh-card');
+    cardEl.classList.remove('fadeUp');
+    void cardEl.offsetWidth;
+    cardEl.classList.add('fadeUp');
+  }
+  document.getElementById('mh-prev').addEventListener('click', () => {
+    if(mirrorCards.length === 0) return;
+    mirrorIdx = (mirrorIdx - 1 + mirrorCards.length) % mirrorCards.length;
+    renderMirror();
+  });
+  document.getElementById('mh-next').addEventListener('click', () => {
+    if(mirrorCards.length === 0) return;
+    mirrorIdx = (mirrorIdx + 1) % mirrorCards.length;
+    renderMirror();
+  });
+
+  function update(){
+    const income = sources.reduce((sum, s) => sum + (s.amount||0), 0);
+    document.getElementById('income-total').textContent = fmt(income);
+    const e = {rent:0, food:0, delivery:0, taxi:0, coffee:0, fun:0, subs:0, other:0};
+    expenses.forEach(x => {
+      const k = e.hasOwnProperty(x.key) ? x.key : 'other';
+      e[k] += (x.amount || 0);
+    });
+    const total = expenses.reduce((sum, x) => sum + (x.amount||0), 0);
+    document.getElementById('expense-total').textContent = fmt(total);
+    const balance = income - total;
+    const rate = income > 0 ? (balance/income)*100 : 0;
+    const pulse = calcPulse(income, total, e);
+    document.getElementById('pulse-num').textContent = pulse;
+    document.getElementById('pulse-status').textContent = statusText(pulse);
+    const dash = 163 - (pulse/100)*163;
+    document.getElementById('gauge-fg').setAttribute('stroke-dashoffset', dash);
+    document.getElementById('k-balance').textContent = (balance>=0?'+':'') + fmt(balance);
+    document.getElementById('k-rate').textContent = rate.toFixed(0) + '%';
+    document.getElementById('k-year').textContent = (balance>=0?'+':'') + fmt(balance*12);
+    document.getElementById('sb-pulse').textContent = pulse;
+    document.getElementById('sb-balance').textContent = (balance>=0?'+':'') + fmt(balance);
+    document.getElementById('sb-year').textContent = (balance>=0?'+':'') + fmt(balance*12);
+    const dot = document.getElementById('sb-dot');
+    if(pulse >= 70) dot.style.background = 'var(--success)';
+    else if(pulse >= 40) dot.style.background = 'var(--gold)';
+    else dot.style.background = 'var(--danger)';
+    mirrorCards = generateMirrors(income, e);
+    if(mirrorIdx >= mirrorCards.length) mirrorIdx = 0;
+    renderMirror();
+    syncToModules(income, balance, e);
+  }
+
+  document.querySelectorAll('.module-card').forEach(card => {
+    card.addEventListener('click', (e) => {
+      if(card.classList.contains('expanded') && e.target.closest('.mc-content')) return;
+      const wasExpanded = card.classList.contains('expanded');
+      document.querySelectorAll('.module-card').forEach(c => c.classList.remove('expanded'));
+      if(!wasExpanded){
+        card.classList.add('expanded');
+        if(card.dataset.module === 'forecast') setTimeout(updateForecast, 50);
+        if(card.dataset.module === 'subs') setTimeout(updateSubs, 50);
+        if(card.dataset.module === 'time') setTimeout(updateTime, 50);
+        setTimeout(() => card.scrollIntoView({behavior:'smooth', block:'start'}), 100);
+      }
+    });
+  });
+
+  function syncToModules(income, balance, e){
+    const fcMonthly = document.getElementById('fc-monthly');
+    if(fcMonthly && !fcMonthly._userTouched && balance > 0){
+      fcMonthly.value = Math.max(0, Math.round(balance/1000)*1000);
+    }
+    const timeRate = document.getElementById('time-rate');
+    const timeHours = +(document.getElementById('time-hours').value) || 168;
+    if(timeRate && !timeRate._userTouched && income > 0){
+      timeRate.value = Math.round(income / timeHours);
+    }
+    if(document.querySelector('.module-card[data-module="time"].expanded')) updateTime();
+    if(document.querySelector('.module-card[data-module="forecast"].expanded')) updateForecast();
+  }
+
+  function updateGoal(){
+    const total = +document.getElementById('goal-amount').value || 0;
+    const saved = +document.getElementById('goal-saved').value || 0;
+    const months = Math.max(1, +document.getElementById('goal-months').value || 1);
+    const remaining = Math.max(0, total - saved);
+    const monthly = remaining / months;
+    const pct = total > 0 ? Math.min(100, (saved/total)*100) : 0;
+    document.getElementById('goal-monthly').textContent = fmt(monthly);
+    document.getElementById('goal-remaining').textContent = fmt(remaining);
+    document.getElementById('goal-percent').textContent = pct.toFixed(0) + '%';
+    document.getElementById('goal-progress-bar').style.width = pct + '%';
+    const date = new Date();
+    date.setMonth(date.getMonth() + months);
+    document.getElementById('goal-date').textContent = date.toLocaleDateString('ru-RU', {month:'short', year:'numeric'});
+    document.getElementById('goal-progress-text').textContent = `${fmt(saved)} из ${fmt(total)} · ${pct.toFixed(0)}%`;
+    const balance = sources.reduce((s,x)=>s+x.amount,0) - expenses.reduce((s,x)=>s+x.amount,0);
+    let msg;
+    if(balance >= monthly){
+      msg = `Хорошие новости: твой остаток <b>${fmt(balance)}</b> покрывает <b>${fmt(monthly)}</b>. Цель достижима.`;
+    } else if(balance > 0){
+      const diff = monthly - balance;
+      msg = `Нужно <b>${fmt(monthly)}</b>, остаток <b>${fmt(balance)}</b>. Не хватает <b>${fmt(diff)}</b> — урежь категорию или увеличь срок.`;
+    } else {
+      msg = `<b>${fmt(monthly)}</b> в месяц при текущем балансе — серьёзно. Увеличить срок до ${Math.ceil(months*1.5)} мес → платёж <b>${fmt(remaining/(months*1.5))}</b>.`;
+    }
+    document.getElementById('goal-mirror').innerHTML = msg;
+  }
+  ['goal-amount','goal-saved','goal-months'].forEach(id =>
+    document.getElementById(id).addEventListener('input', updateGoal));
+
+  function updateLoan(){
+    const P = +document.getElementById('loan-amount').value || 0;
+    const annualRate = +document.getElementById('loan-rate').value || 0;
+    const n = Math.max(1, +document.getElementById('loan-months').value || 1);
+    const r = annualRate / 100 / 12;
+    let monthly = r === 0 ? P / n : P * (r * Math.pow(1+r, n)) / (Math.pow(1+r, n) - 1);
+    const totalPay = monthly * n;
+    const overpay = totalPay - P;
+    const overpayPct = P > 0 ? (overpay/P)*100 : 0;
+    document.getElementById('loan-monthly').textContent = fmt(monthly);
+    document.getElementById('loan-overpay').textContent = '-' + fmt(overpay);
+    document.getElementById('loan-overpay-pct').textContent = overpayPct.toFixed(0) + '% к телу';
+    document.getElementById('loan-total').textContent = fmt(totalPay);
+    document.getElementById('loan-years').textContent = (n/12).toFixed(1);
+    document.getElementById('loan-info').textContent = `${P>0?fmt(P):'—'} под ${annualRate}% на ${n} мес`;
+    const depRate = 0.12 / 12;
+    let savedAmount = 0;
+    for(let i=0; i<n; i++) savedAmount = (savedAmount + monthly) * (1 + depRate);
+    const altDiff = savedAmount - P;
+    document.getElementById('loan-alt').innerHTML = P === 0 ? 'Введи сумму кредита.' :
+      `Откладывая <b>${fmt(monthly)}</b>/мес на вклад под 12%, через ${n} мес получишь <b>${fmt(savedAmount)}</b> — это на <b>${fmt(Math.abs(altDiff))} ${altDiff>0?'больше':'меньше'}</b> кредита. Переплата <b>${fmt(overpay)}</b>.`;
+  }
+  ['loan-amount','loan-rate','loan-months'].forEach(id =>
+    document.getElementById(id).addEventListener('input', updateLoan));
+
+  let fcChart = null;
+  function updateForecast(){
+    const start = +document.getElementById('fc-start').value || 0;
+    const monthly = +document.getElementById('fc-monthly').value || 0;
+    const annualRate = +document.getElementById('fc-rate').value || 0;
+    const years = Math.max(1, +document.getElementById('fc-years').value || 1);
+    const r = annualRate / 100 / 12;
+    const labels = ['Старт'];
+    const withInterest = [start];
+    const withoutInterest = [start];
+    let bal = start, plain = start;
+    for(let y=1; y<=years; y++){
+      for(let m=0; m<12; m++){
+        bal = (bal + monthly) * (1 + r);
+        plain = plain + monthly;
+      }
+      labels.push(`${y} год`);
+      withInterest.push(bal);
+      withoutInterest.push(plain);
+    }
+    const invested = start + monthly * 12 * years;
+    const profit = bal - invested;
+    document.getElementById('fc-final').textContent = fmt(bal);
+    document.getElementById('fc-invested').textContent = fmt(invested);
+    document.getElementById('fc-profit').textContent = '+' + fmt(profit);
+    const ctxC = document.getElementById('fc-chart');
+    if(!ctxC) return;
+    const ctx = ctxC.getContext('2d');
+    if(fcChart) fcChart.destroy();
+    const grad = ctx.createLinearGradient(0,0,0,260);
+    grad.addColorStop(0, 'rgba(255,180,34,0.30)');
+    grad.addColorStop(1, 'rgba(255,180,34,0.02)');
+    fcChart = new Chart(ctx, {
+      type:'line',
+      data:{labels,
+        datasets:[
+          {label:'С процентами', data:withInterest, borderColor:'#FFB422', backgroundColor:grad, borderWidth:2.5, fill:true, tension:0.4, pointBackgroundColor:'#FFC547', pointBorderColor:'#FFB422', pointRadius:3, pointHoverRadius:6},
+          {label:'Просто копить', data:withoutInterest, borderColor:'#A1A1AA', borderWidth:1.5, fill:false, tension:0.4, borderDash:[4,4], pointRadius:0}
+        ]
+      },
+      options:{responsive:true, maintainAspectRatio:false,
+        plugins:{legend:{labels:{color:'#52525B',font:{size:11,family:"Inter"},usePointStyle:true,pointStyle:'circle'}}},
+        scales:{
+          x:{grid:{color:'#F4F4F5'},ticks:{color:'#A1A1AA',font:{size:10,family:"Inter"}},border:{display:false}},
+          y:{grid:{color:'#F4F4F5'},ticks:{color:'#A1A1AA',font:{size:10,family:"Inter"},callback:v=>fmt(v)},border:{display:false}}
+        }
+      }
+    });
+    let msg;
+    if(annualRate === 0){
+      msg = `Без процентов — просто копилка. Открой вклад под 12–15%, чтобы деньги работали.`;
+    } else if(profit > invested){
+      msg = `За ${years} лет проценты дадут <b>${fmt(profit)}</b> — больше, чем ты вложишь сам. Магия сложного процента.`;
+    } else {
+      msg = `За ${years} лет накопишь <b>${fmt(bal)}</b>, из них <b>${fmt(profit)}</b> заработают проценты. +5 000 ₽/мес = ещё <b>~${fmt(5000*12*years*1.4)}</b> к итогу.`;
+    }
+    document.getElementById('fc-mirror').innerHTML = msg;
+  }
+  ['fc-start','fc-monthly','fc-rate','fc-years'].forEach(id => {
+    const el = document.getElementById(id);
+    el.addEventListener('input', () => { el._userTouched = true; updateForecast(); });
+  });
+
+  let subs = [
+    {id:1, name:'Netflix', cost:599, used:true},
+    {id:2, name:'Apple Music', cost:299, used:true},
+    {id:3, name:'YouTube Premium', cost:329, used:false},
+    {id:4, name:'Кинопоиск', cost:399, used:true},
+    {id:5, name:'iCloud 200GB', cost:149, used:true},
+    {id:6, name:'Adobe CC', cost:1690, used:false}
+  ];
+  let subNextId = 100;
+  function renderSubs(){
+    const list = document.getElementById('subs-list');
+    if(!list) return;
+    if(subs.length === 0){
+      list.innerHTML = '<div style="text-align:center;padding:18px;color:var(--text-3);font-size:13px">Добавь свои подписки</div>';
+      return;
+    }
+    list.innerHTML = '';
+    subs.forEach(s => {
+      const row = document.createElement('div');
+      row.className = 'sub-item' + (s.used?'':' unused');
+      row.innerHTML = `
+        <div class="sub-toggle ${s.used?'on':'off'}" data-id="${s.id}" data-tip="${s.used?'Использую':'Не использую'}">${s.used?'✓':'✗'}</div>
+        <input class="item-name" type="text" value="${s.name.replace(/"/g,'&quot;')}" data-id="${s.id}" placeholder="Название">
+        <div class="item-amt-wrap">
+          <input class="item-amt" type="number" value="${s.cost}" min="0" step="50" data-id="${s.id}">
+          <span class="item-suffix">₽/м</span>
+        </div>
+        <div class="sub-yearly">${fmt(s.cost*12)}/год</div>
+        <button class="item-rm" data-id="${s.id}" data-tip="Удалить">×</button>
+      `;
+      list.appendChild(row);
+    });
+    list.querySelectorAll('.sub-toggle').forEach(el => el.addEventListener('click', e => {
+      e.stopPropagation();
+      const id = +e.target.dataset.id;
+      const s = subs.find(x => x.id === id);
+      if(s){ s.used = !s.used; renderSubs(); updateSubs(); }
+    }));
+    list.querySelectorAll('.item-amt').forEach(inp => inp.addEventListener('input', e => {
+      const id = +e.target.dataset.id;
+      const s = subs.find(x => x.id === id);
+      if(s){ s.cost = Math.max(0, +e.target.value || 0); renderSubs(); updateSubs(); }
+    }));
+    list.querySelectorAll('.item-name').forEach(inp => inp.addEventListener('input', e => {
+      const id = +e.target.dataset.id;
+      const s = subs.find(x => x.id === id);
+      if(s) s.name = e.target.value;
+    }));
+    list.querySelectorAll('.item-rm').forEach(btn => btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const id = +e.target.dataset.id;
+      const idx = subs.findIndex(x => x.id === id);
+      if(idx >= 0) subs.splice(idx, 1);
+      renderSubs(); updateSubs();
+    }));
+  }
+  document.getElementById('add-sub').addEventListener('click', e => {
+    e.stopPropagation();
+    subs.push({id: subNextId++, name:'Новая подписка', cost:0, used:true});
+    renderSubs(); updateSubs();
+  });
+  function updateSubs(){
+    const monthly = subs.filter(s=>s.used).reduce((sum, s) => sum + s.cost, 0);
+    const yearly = monthly * 12;
+    const unused = subs.filter(s=>!s.used);
+    const wasted = unused.reduce((sum, s) => sum + s.cost*12, 0);
+    document.getElementById('subs-year').textContent = fmt(yearly);
+    document.getElementById('subs-month-info').textContent = `${fmt(monthly)}/мес на ${subs.filter(s=>s.used).length} подписки`;
+    document.getElementById('subs-active').textContent = subs.filter(s=>s.used).length;
+    document.getElementById('subs-unused').textContent = unused.length;
+    document.getElementById('subs-saved').textContent = fmt(wasted);
+    const mirror = document.getElementById('subs-mirror');
+    if(unused.length > 0){
+      mirror.innerHTML = `У тебя <b>${unused.length}</b> неиспользуемые подписки = <b>${fmt(wasted)}</b> в год — это ${Math.floor(wasted/3000)} ужин(а) в хорошем кафе.`;
+    } else if(yearly > 30000){
+      mirror.innerHTML = `<b>${fmt(yearly)}</b> в год на подписки. Раз в квартал пересматривай — что реально нужно, а что привычка.`;
+    } else {
+      mirror.innerHTML = `Подписки в норме — <b>${fmt(yearly)}</b> в год.`;
+    }
+  }
+
+  function updateTime(){
+    const rate = +document.getElementById('time-rate').value || 1;
+    const list = document.getElementById('time-list');
+    if(!list) return;
+    if(expenses.length === 0){
+      list.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text-3);font-size:13px">Сначала добавь расходы</div>';
+      document.getElementById('time-mirror').innerHTML = '—';
+      return;
+    }
+    list.innerHTML = '';
+    const sorted = [...expenses].sort((a,b)=>b.amount-a.amount).slice(0,10);
+    sorted.forEach(x => {
+      const hours = x.amount / rate;
+      const days = hours / 8;
+      let timeStr = hours < 1 ? `${Math.round(hours*60)} мин` : hours < 24 ? `${hours.toFixed(1)} ч` : `${days.toFixed(1)} дней`;
+      const row = document.createElement('div');
+      row.className = 'time-row';
+      row.innerHTML = `
+        <div class="tr-name"><span class="em">${x.icon}</span>${x.name}</div>
+        <div class="tr-amt">${fmt(x.amount)}</div>
+        <div class="tr-time">${timeStr}</div>
+      `;
+      list.appendChild(row);
+    });
+    const totalHours = expenses.reduce((s,x)=>s+x.amount,0)/rate;
+    const totalDays = totalHours/8;
+    document.getElementById('time-mirror').innerHTML = `Все месячные расходы — это <b>${totalHours.toFixed(0)} часов</b> работы или <b>${totalDays.toFixed(1)} рабочих дней</b>. Каждый чек — часть твоей жизни.`;
+  }
+  ['time-rate','time-hours'].forEach(id => {
+    const el = document.getElementById(id);
+    el.addEventListener('input', () => { el._userTouched = true; updateTime(); });
+  });
+
+  applyPreset('spec');
+  updateGoal();
+  updateLoan();
+  renderSubs();
+  updateSubs();
+
+  // Smart sticky-bar: show only when pulse-strip out of viewport
+  const stickyBar = document.getElementById('sticky');
+  const pulseStripEl = document.querySelector('.pulse-strip');
+  if(pulseStripEl && stickyBar && 'IntersectionObserver' in window){
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if(entry.isIntersecting){
+          stickyBar.classList.remove('show');
+        } else {
+          // Show only when scrolled past (not before page load)
+          const rect = pulseStripEl.getBoundingClientRect();
+          if(rect.bottom < 0) stickyBar.classList.add('show');
+          else stickyBar.classList.remove('show');
+        }
+      });
+    }, {threshold: 0, rootMargin: '0px'});
+    obs.observe(pulseStripEl);
+  }
+
+  // Service Worker registration
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW registration failed:', err));
+  }
+</script>
+</body>
+</html>

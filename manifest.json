@@ -1,0 +1,33 @@
+{
+  "name": "FinPulse — финансы, которые понимают тебя",
+  "short_name": "FinPulse",
+  "description": "AI-зеркало твоей жизни через деньги. Учёт расходов, лимиты, цели и Lifestyle Mirror",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#FFFFFF",
+  "theme_color": "#FFB422",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%23FFB422' width='192' height='192'/><circle cx='96' cy='96' r='48' fill='%23FFFFFF'/></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect fill='%23FFB422' width='512' height='512'/><circle cx='256' cy='256' r='128' fill='%23FFFFFF'/></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 540 720'><rect fill='%23FFFFFF' width='540' height='720'/><text x='270' y='360' font-size='48' text-anchor='middle' fill='%23FFB422' font-family='sans-serif'>FinPulse</text></svg>",
+      "sizes": "540x720",
+      "type": "image/svg+xml",
+      "form_factor": "narrow"
+    }
+  ]
+}

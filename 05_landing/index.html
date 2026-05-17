@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FinPulse — финансы, которые понимают тебя</title>
+<meta name="description" content="AI-зеркало твоей жизни через деньги. Учёт расходов, лимиты, цели и Lifestyle Mirror — единственный PFM в СНГ с AI-инсайтами на русском.">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#FFB422">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%23FFB422' width='192' height='192'/><circle cx='96' cy='96' r='48' fill='%23FFFFFF'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FFFFFF;
+    --surface:#FFFFFF;
+    --surface-2:#FAFAFA;
+    --surface-3:#F4F4F5;
+    --border:#E8E8EA;
+    --border-strong:#D4D4D8;
+    --border-faint:#F1F1F3;
+    --text:#09090B;
+    --text-2:#52525B;
+    --text-3:#A1A1AA;
+    --text-4:#D4D4D8;
+    --gold:#FFB422;
+    --gold-bright:#FFC547;
+    --gold-deep:#C97E00;
+    --gold-text:#946100;
+    --gold-soft:rgba(255,180,34,0.12);
+    --gold-border:rgba(255,180,34,0.45);
+    --danger:#DC2626;
+    --success:#16A34A;
+    --sh-card:0 1px 2px rgba(0,0,0,0.04);
+    --sh-hover:0 12px 32px rgba(0,0,0,0.08);
+    --sh-pop:0 24px 48px rgba(0,0,0,0.10);
+    --sh-gold:0 12px 32px rgba(255,180,34,0.32);
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+  body{
+    background:var(--bg);color:var(--text);
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sans-serif;
+    line-height:1.5;font-feature-settings:'cv02','cv03','cv11','ss01';
+    min-height:100vh;font-weight:400;letter-spacing:-0.005em;
+    overflow-x:hidden;
+  }
+  .num{font-variant-numeric:tabular-nums}
+  a{color:inherit;text-decoration:none}
+
+  .container{max-width:1200px;margin:0 auto;padding:0 24px}
+  .container-narrow{max-width:920px;margin:0 auto;padding:0 24px}
+
+  /* ============ NAVBAR ============ */
+  .nav{
+    position:fixed;top:0;left:0;right:0;z-index:100;
+    background:rgba(255,255,255,0.85);backdrop-filter:blur(20px) saturate(180%);
+    -webkit-backdrop-filter:blur(20px) saturate(180%);
+    border-bottom:1px solid transparent;
+    transition:border-color .3s,background .3s;
+  }
+  .nav.scrolled{border-bottom-color:var(--border-faint);background:rgba(255,255,255,0.95)}
+  .nav-inner{
+    max-width:1200px;margin:0 auto;padding:14px 24px;
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+  }
+  .nav-brand{display:flex;align-items:center;gap:10px}
+  .logo-mark{
+    width:24px;height:24px;border-radius:6px;background:var(--text);
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  }
+  .logo-mark::after{content:"";width:8px;height:8px;border-radius:50%;background:var(--gold)}
+  .nav-brand-name{font-size:16px;font-weight:600;letter-spacing:-0.015em;color:var(--text)}
+  .nav-links{display:flex;gap:4px;align-items:center}
+  .nav-link{
+    font-size:14px;color:var(--text-2);font-weight:500;
+    padding:8px 14px;border-radius:8px;transition:all .15s;
+    letter-spacing:-0.005em;
+  }
+  .nav-link:hover{color:var(--text);background:var(--surface-2)}
+  .nav-cta{
+    background:var(--text);color:#fff;
+    font-size:13px;font-weight:600;padding:9px 16px;
+    border-radius:8px;border:none;cursor:pointer;font-family:inherit;
+    transition:all .15s;letter-spacing:-0.005em;
+  }
+  .nav-cta:hover{background:var(--gold-deep);transform:translateY(-1px)}
+
+  /* ============ COMMON SECTIONS ============ */
+  section{padding:96px 0;position:relative}
+  .sec-eyebrow{
+    display:inline-flex;align-items:center;gap:8px;
+    font-size:12px;font-weight:500;letter-spacing:0.04em;
+    color:var(--text-2);margin-bottom:20px;
+  }
+  .sec-eyebrow .dash{width:16px;height:1px;background:var(--gold)}
+  .sec-eyebrow.center{margin-left:auto;margin-right:auto}
+  h2.sec-title{
+    font-size:48px;line-height:1.05;font-weight:600;
+    letter-spacing:-0.03em;color:var(--text);
+    margin-bottom:16px;max-width:720px;
+  }
+  h2.sec-title .accent{color:var(--gold-deep)}
+  h2.sec-title.center{text-align:center;margin-left:auto;margin-right:auto}
+  .sec-lead{
+    font-size:18px;color:var(--text-2);line-height:1.55;
+    max-width:600px;font-weight:400;margin-bottom:48px;
+  }
+  .sec-lead.center{text-align:center;margin-left:auto;margin-right:auto}
+
+  /* ============ HERO ============ */
+  .hero{
+    padding:128px 0 80px;position:relative;
+    background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(255,180,34,0.06),transparent 70%);
+  }
+  .hero-grid{
+    display:grid;grid-template-columns:1.15fr 1fr;
+    gap:48px;align-items:center;
+  }
+  .hero-tag{
+    display:inline-flex;align-items:center;gap:8px;
+    font-size:12px;font-weight:500;letter-spacing:0.04em;
+    color:var(--gold-deep);background:var(--gold-soft);
+    padding:6px 12px;border-radius:24px;margin-bottom:24px;
+    border:1px solid var(--gold-border);
+  }
+  .hero-tag .pulse-dot{
+    width:6px;height:6px;border-radius:50%;background:var(--gold);
+    box-shadow:0 0 0 4px rgba(255,180,34,0.18);
+    animation:pulse 2s infinite;
+  }
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+  h1.hero-h{
+    font-size:72px;line-height:1.02;font-weight:700;
+    letter-spacing:-0.04em;color:var(--text);margin-bottom:24px;
+  }
+  h1.hero-h .accent{
+    background:linear-gradient(135deg,#FFB422 0%,#C97E00 100%);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  }
+  .hero-lead{
+    font-size:19px;color:var(--text-2);line-height:1.55;
+    max-width:520px;font-weight:400;margin-bottom:36px;
+  }
+  .hero-cta-row{display:flex;gap:12px;flex-wrap:wrap}
+  .btn-store{
+    background:var(--text);color:#fff;
+    border:none;border-radius:12px;padding:14px 22px;
+    font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;
+    display:flex;align-items:center;gap:12px;
+    transition:all .2s;letter-spacing:-0.005em;
+  }
+  .btn-store:hover{background:var(--gold-deep);transform:translateY(-1px);box-shadow:var(--sh-pop)}
+  .btn-store .store-icon{width:24px;height:24px;flex-shrink:0}
+  .btn-store .store-meta{display:flex;flex-direction:column;align-items:flex-start;line-height:1.1}
+  .btn-store .store-meta .small{font-size:10px;opacity:0.7;font-weight:400;letter-spacing:0.02em;text-transform:uppercase}
+  .btn-store .store-meta .big{font-size:15px;font-weight:600}
+  .btn-secondary{
+    background:transparent;color:var(--text);
+    border:1px solid var(--border);border-radius:12px;padding:14px 22px;
+    font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;
+    transition:all .15s;letter-spacing:-0.005em;
+  }
+  .btn-secondary:hover{border-color:var(--text);background:var(--surface-2)}
+
+  .hero-trust{
+    display:flex;align-items:center;gap:16px;margin-top:32px;
+    font-size:13px;color:var(--text-3);font-weight:500;
+  }
+  .hero-trust .stars{color:var(--gold);font-size:14px;letter-spacing:1px}
+
+  /* iPhone Mockup */
+  .phone-wrap{
+    position:relative;display:flex;justify-content:center;
+    perspective:2000px;
+  }
+  .phone{
+    position:relative;
+    transform:rotate(-4deg) rotateY(8deg);
+    transition:transform .6s ease;
+    filter:drop-shadow(0 30px 60px rgba(0,0,0,0.18));
+  }
+  .phone:hover{transform:rotate(0deg) rotateY(0deg)}
+
+  /* ============ TRUSTBAR ============ */
+  .trustbar{
+    padding:40px 0;border-top:1px solid var(--border-faint);
+    border-bottom:1px solid var(--border-faint);
+  }
+  .trustbar-inner{
+    display:flex;align-items:center;justify-content:space-between;
+    flex-wrap:wrap;gap:32px;
+  }
+  .trust-stat{display:flex;align-items:center;gap:12px}
+  .trust-stat-num{
+    font-size:28px;font-weight:700;color:var(--text);
+    font-variant-numeric:tabular-nums;letter-spacing:-0.025em;
+  }
+  .trust-stat-num .gold{color:var(--gold-deep)}
+  .trust-stat-lbl{font-size:13px;color:var(--text-2);font-weight:500;line-height:1.3}
+  .trust-divider{width:1px;height:40px;background:var(--border)}
+
+  /* ============ MIRROR HERO ============ */
+  .mirror-section{
+    background:var(--text);color:#fff;
+    border-radius:32px;margin:0 24px;overflow:hidden;
+    position:relative;
+  }
+  .mirror-section::before{
+    content:"";position:absolute;top:-50%;right:-20%;
+    width:800px;height:800px;border-radius:50%;
+    background:radial-gradient(circle,rgba(255,180,34,0.10),transparent 60%);
+    pointer-events:none;
+  }
+  .mirror-inner{padding:96px 64px;position:relative}
+  .mirror-grid{display:grid;grid-template-columns:1fr 1.1fr;gap:64px;align-items:center}
+  .mirror-text .sec-eyebrow{color:var(--gold-bright)}
+  .mirror-text .sec-eyebrow .dash{background:var(--gold)}
+  .mirror-text h2{
+    font-size:52px;line-height:1.05;font-weight:700;
+    letter-spacing:-0.035em;color:#fff;margin-bottom:20px;
+  }
+  .mirror-text h2 .accent{color:var(--gold-bright)}
+  .mirror-text p{font-size:18px;color:rgba(255,255,255,0.7);line-height:1.55;margin-bottom:36px;max-width:480px}
+  .mirror-quote{
+    border-left:2px solid var(--gold);padding-left:20px;
+    color:rgba(255,255,255,0.85);font-style:italic;font-size:17px;line-height:1.6;
+    max-width:460px;
+  }
+
+  .mirror-cards{display:flex;flex-direction:column;gap:14px}
+  .mirror-msg{
+    background:rgba(255,255,255,0.05);
+    border:1px solid rgba(255,255,255,0.10);
+    border-radius:16px;padding:20px 22px;
+    backdrop-filter:blur(10px);
+    transition:transform .3s,background .3s;
+  }
+  .mirror-msg:hover{
+    background:rgba(255,255,255,0.08);
+    transform:translateX(-4px);
+  }
+  .mirror-msg-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .mirror-msg-tag{
+    background:rgba(255,180,34,0.18);color:var(--gold-bright);
+    padding:4px 10px;border-radius:20px;font-size:10px;font-weight:600;
+    letter-spacing:0.10em;text-transform:uppercase;
+  }
+  .mirror-msg-time{font-size:11px;color:rgba(255,255,255,0.4);font-weight:500;margin-left:auto}
+  .mirror-msg-body{font-size:15px;color:#fff;line-height:1.5;font-weight:400}
+  .mirror-msg-body b{color:var(--gold-bright);font-weight:600}
+
+  /* ============ FEATURES ============ */
+  .features-grid{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:16px;
+  }
+  .feature-card{
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:16px;padding:32px;
+    transition:all .25s ease;
+  }
+  .feature-card:hover{
+    border-color:var(--text);transform:translateY(-2px);
+    box-shadow:var(--sh-hover);
+  }
+  .feature-icon{
+    width:44px;height:44px;border-radius:12px;
+    background:var(--surface-3);color:var(--text);
+    display:flex;align-items:center;justify-content:center;
+    margin-bottom:20px;transition:all .25s;
+  }
+  .feature-card:hover .feature-icon{background:var(--gold-soft);color:var(--gold-deep)}
+  .feature-icon svg{width:22px;height:22px;stroke-width:1.8}
+  .feature-title{
+    font-size:18px;font-weight:600;color:var(--text);
+    margin-bottom:8px;letter-spacing:-0.015em;
+  }
+  .feature-desc{font-size:14px;color:var(--text-2);line-height:1.55;font-weight:400}
+
+  /* ============ CALC SECTION ============ */
+  .calc-section{
+    background:var(--surface-2);border-radius:32px;margin:0 24px;
+    padding:80px 64px;text-align:center;
+  }
+  .calc-mockup{
+    margin-top:48px;background:var(--text);border-radius:20px;
+    padding:32px;color:#fff;max-width:880px;margin-left:auto;margin-right:auto;
+    text-align:left;
+  }
+  .calc-mock-row{
+    display:grid;grid-template-columns:auto 1fr auto auto;
+    gap:32px;align-items:center;padding:24px 0;
+    border-bottom:1px solid rgba(255,255,255,0.08);
+  }
+  .calc-mock-row:last-child{border-bottom:none}
+  .mock-pulse-ring{position:relative;width:64px;height:64px;flex-shrink:0}
+  .mock-pulse-ring svg{transform:rotate(-90deg)}
+  .mock-pulse-num{
+    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    font-size:18px;font-weight:600;color:#fff;font-variant-numeric:tabular-nums;
+  }
+  .mock-cell-l{font-size:11px;letter-spacing:0.08em;color:rgba(255,255,255,0.5);text-transform:uppercase;font-weight:500;margin-bottom:4px}
+  .mock-cell-v{font-size:22px;font-weight:600;color:#fff;font-variant-numeric:tabular-nums;letter-spacing:-0.025em}
+  .mock-cell-v.gold{color:var(--gold-bright)}
+  .calc-cta{
+    margin-top:32px;background:var(--gold);color:var(--text);
+    border:none;border-radius:12px;padding:16px 32px;
+    font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;
+    transition:all .2s;display:inline-flex;align-items:center;gap:10px;
+    letter-spacing:-0.005em;
+  }
+  .calc-cta:hover{background:var(--gold-bright);transform:translateY(-1px);box-shadow:var(--sh-gold)}
+  .calc-cta svg{width:16px;height:16px}
+
+  /* ============ SECURITY ============ */
+  .security-section{
+    background:var(--text);color:#fff;
+    border-radius:32px;margin:0 24px;padding:96px 64px;
+    position:relative;overflow:hidden;
+  }
+  .security-section::before{
+    content:"";position:absolute;top:-30%;left:-10%;
+    width:600px;height:600px;border-radius:50%;
+    background:radial-gradient(circle,rgba(255,180,34,0.08),transparent 60%);
+  }
+  .sec-grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;position:relative}
+  .sec-text .sec-eyebrow{color:var(--gold-bright)}
+  .sec-text .sec-eyebrow .dash{background:var(--gold)}
+  .sec-text h2{
+    font-size:48px;line-height:1.05;font-weight:700;
+    letter-spacing:-0.035em;color:#fff;margin-bottom:20px;
+  }
+  .sec-text h2 .accent{color:var(--gold-bright)}
+  .sec-text p{font-size:17px;color:rgba(255,255,255,0.7);line-height:1.6;margin-bottom:32px}
+  .sec-features{display:flex;flex-direction:column;gap:14px}
+  .sec-feature{
+    display:flex;align-items:flex-start;gap:14px;
+    padding:16px 18px;background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.08);border-radius:14px;
+    transition:all .25s;
+  }
+  .sec-feature:hover{background:rgba(255,255,255,0.08);border-color:rgba(255,180,34,0.28)}
+  .sec-feature-icon{
+    flex-shrink:0;width:36px;height:36px;border-radius:10px;
+    background:rgba(255,180,34,0.15);color:var(--gold-bright);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .sec-feature-icon svg{width:18px;height:18px;stroke-width:2}
+  .sec-feature-text .t{font-size:15px;font-weight:600;color:#fff;margin-bottom:3px;letter-spacing:-0.01em}
+  .sec-feature-text .d{font-size:13px;color:rgba(255,255,255,0.6);line-height:1.5}
+
+  /* ============ PRICING ============ */
+  .pricing-grid{
+    display:grid;grid-template-columns:1fr 1fr;gap:16px;
+    max-width:920px;margin:0 auto;
+  }
+  .price-card{
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:20px;padding:40px;position:relative;
+    transition:all .25s;
+  }
+  .price-card:hover{border-color:var(--text);transform:translateY(-2px);box-shadow:var(--sh-hover)}
+  .price-card.featured{
+    background:var(--text);color:#fff;border-color:var(--text);
+  }
+  .price-card.featured:hover{box-shadow:var(--sh-pop)}
+  .price-badge{
+    position:absolute;top:-12px;right:24px;
+    background:var(--gold);color:var(--text);
+    padding:6px 14px;border-radius:20px;
+    font-size:11px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;
+  }
+  .price-name{
+    font-size:14px;font-weight:600;letter-spacing:0.04em;
+    text-transform:uppercase;margin-bottom:8px;
+    color:var(--text-2);
+  }
+  .price-card.featured .price-name{color:var(--gold-bright)}
+  .price-num{
+    font-size:64px;font-weight:700;color:var(--text);
+    letter-spacing:-0.04em;line-height:1;margin-bottom:6px;
+    font-variant-numeric:tabular-nums;
+  }
+  .price-card.featured .price-num{color:#fff}
+  .price-num .currency{font-size:32px;font-weight:600;vertical-align:top;color:var(--text-3)}
+  .price-card.featured .price-num .currency{color:rgba(255,255,255,0.6)}
+  .price-period{font-size:14px;color:var(--text-3);margin-bottom:8px;font-weight:500}
+  .price-card.featured .price-period{color:rgba(255,255,255,0.6)}
+  .price-yearly{font-size:13px;color:var(--gold-deep);font-weight:600;margin-bottom:28px}
+  .price-card.featured .price-yearly{color:var(--gold-bright)}
+  .price-features{display:flex;flex-direction:column;gap:12px;margin-bottom:32px}
+  .price-feature{
+    display:flex;align-items:flex-start;gap:10px;font-size:14px;
+    color:var(--text-2);line-height:1.5;
+  }
+  .price-card.featured .price-feature{color:rgba(255,255,255,0.85)}
+  .price-feature .check{
+    flex-shrink:0;width:18px;height:18px;border-radius:50%;
+    background:var(--gold-soft);color:var(--gold-deep);
+    display:flex;align-items:center;justify-content:center;
+    font-size:11px;font-weight:700;margin-top:2px;
+  }
+  .price-card.featured .price-feature .check{background:var(--gold);color:var(--text)}
+  .price-cta{
+    width:100%;background:var(--text);color:#fff;
+    border:none;border-radius:10px;padding:14px;
+    font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;
+    transition:all .2s;letter-spacing:-0.005em;
+  }
+  .price-card .price-cta:hover{background:var(--gold-deep)}
+  .price-card.featured .price-cta{background:var(--gold);color:var(--text)}
+  .price-card.featured .price-cta:hover{background:var(--gold-bright);transform:translateY(-1px)}
+
+  /* ============ FAQ ============ */
+  .faq-list{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:8px}
+  .faq-item{
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:14px;overflow:hidden;
+    transition:border-color .2s;
+  }
+  .faq-item:hover{border-color:var(--border-strong)}
+  .faq-q{
+    width:100%;background:transparent;border:none;
+    padding:22px 24px;font-family:inherit;cursor:pointer;
+    display:flex;justify-content:space-between;align-items:center;gap:16px;
+    font-size:16px;font-weight:600;color:var(--text);text-align:left;
+    letter-spacing:-0.01em;
+  }
+  .faq-q .arrow{
+    flex-shrink:0;width:24px;height:24px;border-radius:50%;
+    background:var(--surface-3);color:var(--text-2);
+    display:flex;align-items:center;justify-content:center;
+    font-size:14px;transition:all .25s;
+  }
+  .faq-item.open .arrow{transform:rotate(180deg);background:var(--gold);color:var(--text)}
+  .faq-a{
+    max-height:0;overflow:hidden;
+    transition:max-height .35s ease;
+  }
+  .faq-item.open .faq-a{max-height:500px}
+  .faq-a-inner{
+    padding:0 24px 22px;font-size:15px;color:var(--text-2);
+    line-height:1.6;font-weight:400;
+  }
+
+  /* ============ CTA FINAL ============ */
+  .cta-final{
+    background:var(--text);color:#fff;
+    border-radius:32px;margin:0 24px;
+    padding:96px 64px;text-align:center;position:relative;overflow:hidden;
+  }
+  .cta-final::before{
+    content:"";position:absolute;top:-200px;left:50%;transform:translateX(-50%);
+    width:1000px;height:600px;border-radius:50%;
+    background:radial-gradient(circle,rgba(255,180,34,0.10),transparent 60%);
+    pointer-events:none;
+  }
+  .cta-final-inner{position:relative;z-index:2;max-width:600px;margin:0 auto}
+  .cta-final h2{
+    font-size:54px;line-height:1.05;font-weight:700;
+    letter-spacing:-0.035em;color:#fff;margin-bottom:18px;
+  }
+  .cta-final h2 .accent{color:var(--gold-bright)}
+  .cta-final p{font-size:18px;color:rgba(255,255,255,0.7);margin-bottom:36px;line-height:1.55}
+  .cta-final-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .cta-final .btn-store{background:var(--gold);color:var(--text)}
+  .cta-final .btn-store:hover{background:var(--gold-bright)}
+  .cta-final .btn-secondary{background:transparent;color:#fff;border-color:rgba(255,255,255,0.2)}
+  .cta-final .btn-secondary:hover{background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.4)}
+
+  /* ============ FOOTER ============ */
+  footer.site-footer{
+    padding:64px 0 32px;border-top:1px solid var(--border-faint);
+    margin-top:96px;
+  }
+  .foot-grid{
+    display:grid;grid-template-columns:1.2fr repeat(3,1fr);gap:48px;
+    margin-bottom:48px;
+  }
+  .foot-brand{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+  .foot-tagline{font-size:14px;color:var(--text-3);max-width:260px;line-height:1.55}
+  .foot-col h4{
+    font-size:11px;font-weight:600;letter-spacing:0.10em;
+    text-transform:uppercase;color:var(--text-2);margin-bottom:14px;
+  }
+  .foot-col a{
+    display:block;font-size:14px;color:var(--text-2);
+    padding:5px 0;transition:color .15s;font-weight:500;
+  }
+  .foot-col a:hover{color:var(--text)}
+  .foot-bottom{
+    padding-top:32px;border-top:1px solid var(--border-faint);
+    display:flex;justify-content:space-between;align-items:center;
+    flex-wrap:wrap;gap:16px;font-size:12px;color:var(--text-3);font-weight:500;
+  }
+  .foot-bottom a{color:var(--text-3)}
+
+  /* ============ ANIMATIONS ============ */
+  .reveal{opacity:0;transform:translateY(24px);transition:all .8s cubic-bezier(0.22,1,0.36,1)}
+  .reveal.in{opacity:1;transform:translateY(0)}
+  .reveal-stagger > *{opacity:0;transform:translateY(16px);transition:all .6s cubic-bezier(0.22,1,0.36,1)}
+  .reveal-stagger.in > *{opacity:1;transform:translateY(0)}
+  .reveal-stagger.in > *:nth-child(1){transition-delay:0.0s}
+  .reveal-stagger.in > *:nth-child(2){transition-delay:0.08s}
+  .reveal-stagger.in > *:nth-child(3){transition-delay:0.16s}
+  .reveal-stagger.in > *:nth-child(4){transition-delay:0.24s}
+  .reveal-stagger.in > *:nth-child(5){transition-delay:0.32s}
+  .reveal-stagger.in > *:nth-child(6){transition-delay:0.40s}
+
+  /* ============ RESPONSIVE ============ */
+  @media(max-width:980px){
+    section{padding:64px 0}
+    h1.hero-h{font-size:44px;letter-spacing:-0.035em}
+    h2.sec-title,.mirror-text h2,.sec-text h2,.cta-final h2{font-size:34px;letter-spacing:-0.03em}
+    .hero-grid{grid-template-columns:1fr;gap:48px}
+    .nav-links{display:none}
+    .features-grid{grid-template-columns:1fr}
+    .mirror-section,.calc-section,.security-section,.cta-final{margin:0 16px;padding:56px 28px;border-radius:24px}
+    .mirror-grid,.sec-grid{grid-template-columns:1fr;gap:32px}
+    .mirror-inner{padding:56px 28px}
+    .pricing-grid{grid-template-columns:1fr}
+    .calc-mock-row{grid-template-columns:auto 1fr;gap:16px}
+    .calc-mock-row > div:nth-child(3),.calc-mock-row > div:nth-child(4){display:none}
+    .foot-grid{grid-template-columns:1fr 1fr;gap:32px}
+    .trustbar-inner{justify-content:center;text-align:center}
+    .trust-divider{display:none}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ NAVBAR ============ -->
+<nav class="nav" id="nav">
+  <div class="nav-inner">
+    <a href="#" class="nav-brand">
+      <div class="logo-mark"></div>
+      <div class="nav-brand-name">FinPulse</div>
+    </a>
+    <div class="nav-links">
+      <a href="#mirror" class="nav-link">Lifestyle Mirror</a>
+      <a href="#features" class="nav-link">Возможности</a>
+      <a href="#calc" class="nav-link">Калькулятор</a>
+      <a href="#security" class="nav-link">Безопасность</a>
+      <a href="#pricing" class="nav-link">Цены</a>
+      <a href="#cta" class="nav-link">FAQ</a>
+    </div>
+    <button class="nav-cta" onclick="alert('FinPulse скоро в App Store. Подпишись на главной!')">Получить доступ</button>
+  </div>
+</nav>
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-grid">
+      <div class="reveal">
+        <div class="hero-tag"><span class="pulse-dot"></span>В beta · 1 247 ранних пользователей</div>
+        <h1 class="hero-h">Финансы, которые<br><span class="accent">понимают тебя.</span></h1>
+        <p class="hero-lead">Не очередной учёт расходов. Lifestyle Mirror AI видит, как ты живёшь — через то, на что ты тратишь деньги. Подсказывает, где сэкономить и как жить лучше. На русском, с первой минуты.</p>
+        <div class="hero-cta-row">
+          <button class="btn-store" onclick="alert('Скоро в App Store!')">
+            <svg class="store-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
+            <div class="store-meta">
+              <span class="small">Скоро в</span>
+              <span class="big">App Store</span>
+            </div>
+          </button>
+          <button class="btn-store" onclick="alert('Скоро в Google Play!')">
+            <svg class="store-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.198l2.807 1.626a1 1 0 010 1.73l-2.808 1.626L15.69 12l1.998-1.99zm-12.7-8.84L17.392 9.69 15.09 11.99 4.998.69z"/></svg>
+            <div class="store-meta">
+              <span class="small">Скоро в</span>
+              <span class="big">Google Play</span>
+            </div>
+          </button>
+          <a href="#calc" class="btn-secondary">Попробовать демо →</a>
+        </div>
+        <div class="hero-trust">
+          <span class="stars">★★★★★</span>
+          <span>4.9 средний рейтинг beta-тестеров</span>
+        </div>
+      </div>
+
+      <!-- iPhone Mockup -->
+      <div class="phone-wrap reveal">
+        <svg class="phone" width="320" height="650" viewBox="0 0 320 650" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="goldGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#FFC547"/>
+              <stop offset="100%" stop-color="#C97E00"/>
+            </linearGradient>
+            <linearGradient id="goldFill" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#FFB422" stop-opacity="0.3"/>
+              <stop offset="100%" stop-color="#FFB422" stop-opacity="0.05"/>
+            </linearGradient>
+          </defs>
+          <!-- Phone body -->
+          <rect x="0" y="0" width="320" height="650" rx="44" fill="#09090B"/>
+          <rect x="6" y="6" width="308" height="638" rx="38" fill="#FFFFFF"/>
+          <!-- Notch -->
+          <rect x="125" y="14" width="70" height="22" rx="11" fill="#09090B"/>
+          <!-- Status bar -->
+          <text x="28" y="52" fill="#09090B" font-family="Inter" font-size="13" font-weight="600">9:41</text>
+          <g transform="translate(248,42)">
+            <rect width="22" height="11" rx="3" fill="none" stroke="#09090B" stroke-width="1"/>
+            <rect x="2" y="2" width="14" height="7" rx="1" fill="#09090B"/>
+          </g>
+          <!-- Header -->
+          <text x="28" y="92" fill="#A1A1AA" font-family="Inter" font-size="11" font-weight="600" letter-spacing="1.5">ДОБРОЕ УТРО, МАКС</text>
+          <text x="28" y="120" fill="#09090B" font-family="Inter" font-size="22" font-weight="700" letter-spacing="-0.5">Финансовый пульс</text>
+
+          <!-- Pulse card -->
+          <rect x="20" y="142" width="280" height="170" rx="20" fill="#09090B"/>
+          <!-- Ring -->
+          <g transform="translate(56,232)">
+            <circle r="40" fill="none" stroke="rgba(255,255,255,0.10)" stroke-width="6"/>
+            <circle r="40" fill="none" stroke="url(#goldGrad1)" stroke-width="6" stroke-linecap="round"
+              stroke-dasharray="251.3" stroke-dashoffset="60.3" transform="rotate(-90)"/>
+            <text y="6" text-anchor="middle" fill="#fff" font-family="Inter" font-size="28" font-weight="700">76</text>
+          </g>
+          <text x="120" y="200" fill="rgba(255,255,255,0.5)" font-family="Inter" font-size="10" font-weight="600" letter-spacing="1">ВАШ ПУЛЬС</text>
+          <text x="120" y="222" fill="#fff" font-family="Inter" font-size="16" font-weight="600">Здоровый ритм</text>
+          <text x="120" y="248" fill="rgba(255,255,255,0.4)" font-family="Inter" font-size="11" font-weight="400">+12% за месяц</text>
+          <!-- Mini chart -->
+          <polyline points="120,290 140,278 160,283 180,265 200,272 220,250 240,258 260,240 280,234"
+            fill="none" stroke="#FFB422" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+
+          <!-- Mirror card -->
+          <rect x="20" y="328" width="280" height="125" rx="16" fill="#FFFFFF" stroke="#FFB422" stroke-width="1.5"/>
+          <rect x="32" y="340" width="60" height="20" rx="10" fill="#FFB422" fill-opacity="0.18"/>
+          <text x="62" y="355" text-anchor="middle" fill="#946100" font-family="Inter" font-size="9" font-weight="700" letter-spacing="0.8">ЗДОРОВЬЕ</text>
+          <g transform="translate(254,344)">
+            <circle r="14" fill="#09090B"/>
+            <text y="5" text-anchor="middle" fill="#FFB422" font-size="14">🪞</text>
+          </g>
+          <text x="32" y="385" fill="#09090B" font-family="Inter" font-size="13" font-weight="500">Ты тратишь 18 000 ₽ на</text>
+          <text x="32" y="403" fill="#09090B" font-family="Inter" font-size="13" font-weight="500">такси и доставку.</text>
+          <text x="32" y="425" fill="#52525B" font-family="Inter" font-size="12" font-weight="400">Зал = 2 500 ₽, освободит</text>
+          <text x="32" y="442" fill="#946100" font-family="Inter" font-size="12" font-weight="700">8 000 ₽ и улучшит самочувствие</text>
+
+          <!-- KPIs -->
+          <rect x="20" y="468" width="88" height="76" rx="14" fill="#FAFAFA" stroke="#E8E8EA"/>
+          <text x="32" y="490" fill="#A1A1AA" font-family="Inter" font-size="9" font-weight="600" letter-spacing="0.8">ОСТАТОК</text>
+          <text x="32" y="514" fill="#946100" font-family="Inter" font-size="18" font-weight="700">+38k ₽</text>
+          <text x="32" y="532" fill="#A1A1AA" font-family="Inter" font-size="10" font-weight="500">в месяц</text>
+
+          <rect x="116" y="468" width="88" height="76" rx="14" fill="#FAFAFA" stroke="#E8E8EA"/>
+          <text x="128" y="490" fill="#A1A1AA" font-family="Inter" font-size="9" font-weight="600" letter-spacing="0.8">ЕДА</text>
+          <text x="128" y="514" fill="#09090B" font-family="Inter" font-size="18" font-weight="700">12k</text>
+          <text x="128" y="532" fill="#16A34A" font-family="Inter" font-size="10" font-weight="600">66% лимита</text>
+
+          <rect x="212" y="468" width="88" height="76" rx="14" fill="#FAFAFA" stroke="#E8E8EA"/>
+          <text x="224" y="490" fill="#A1A1AA" font-family="Inter" font-size="9" font-weight="600" letter-spacing="0.8">ТАКСИ</text>
+          <text x="224" y="514" fill="#09090B" font-family="Inter" font-size="18" font-weight="700">8.4k</text>
+          <text x="224" y="532" fill="#DC2626" font-family="Inter" font-size="10" font-weight="600">120% лимита</text>
+
+          <!-- Bottom nav -->
+          <line x1="20" y1="572" x2="300" y2="572" stroke="#F1F1F3" stroke-width="1"/>
+          <g fill="#A1A1AA">
+            <circle cx="60" cy="600" r="3" fill="#FFB422"/>
+            <text x="60" y="618" text-anchor="middle" font-family="Inter" font-size="9" font-weight="600">Дом</text>
+          </g>
+          <g fill="#A1A1AA">
+            <circle cx="120" cy="600" r="3"/>
+            <text x="120" y="618" text-anchor="middle" font-family="Inter" font-size="9" font-weight="500">Mirror</text>
+          </g>
+          <g fill="#A1A1AA">
+            <circle cx="180" cy="600" r="3"/>
+            <text x="180" y="618" text-anchor="middle" font-family="Inter" font-size="9" font-weight="500">Цели</text>
+          </g>
+          <g fill="#A1A1AA">
+            <circle cx="240" cy="600" r="3"/>
+            <text x="240" y="618" text-anchor="middle" font-family="Inter" font-size="9" font-weight="500">Семья</text>
+          </g>
+          <g fill="#A1A1AA">
+            <circle cx="280" cy="600" r="3"/>
+            <text x="280" y="618" text-anchor="middle" font-family="Inter" font-size="9" font-weight="500">·</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TRUST BAR ============ -->
+<div class="trustbar">
+  <div class="container">
+    <div class="trustbar-inner reveal">
+      <div class="trust-stat">
+        <div class="trust-stat-num"><span class="gold">1 247</span></div>
+        <div class="trust-stat-lbl">Beta-пользователей</div>
+      </div>
+      <div class="trust-divider"></div>
+      <div class="trust-stat">
+        <div class="trust-stat-num">4.9 ★</div>
+        <div class="trust-stat-lbl">Средний рейтинг<br>в beta</div>
+      </div>
+      <div class="trust-divider"></div>
+      <div class="trust-stat">
+        <div class="trust-stat-num"><span class="gold">8 432 ₽</span></div>
+        <div class="trust-stat-lbl">Средняя экономия<br>в первый месяц</div>
+      </div>
+      <div class="trust-divider"></div>
+      <div class="trust-stat">
+        <div class="trust-stat-num">28 +</div>
+        <div class="trust-stat-lbl">Банков СНГ<br>через SMS-парсинг</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MIRROR ============ -->
+<section id="mirror">
+  <div class="mirror-section reveal">
+    <div class="mirror-inner">
+      <div class="mirror-grid">
+        <div class="mirror-text">
+          <div class="sec-eyebrow"><span class="dash"></span>Lifestyle Mirror</div>
+          <h2>Зеркало твоей жизни <span class="accent">через деньги</span></h2>
+          <p>AI смотрит не на цифры, а на твои паттерны. И даёт лайф-советы, а не финансовые. Это не просто учёт — это разговор с другом, который знает, как ты живёшь.</p>
+          <div class="mirror-quote">
+            «Не „куда ушли деньги“, а „как ты живёшь, судя по своим тратам“. Это другой подход к личным финансам.»
+          </div>
+        </div>
+        <div class="mirror-cards reveal-stagger">
+          <div class="mirror-msg">
+            <div class="mirror-msg-head">
+              <span class="mirror-msg-tag">Здоровье</span>
+              <span class="mirror-msg-time">3 мин назад</span>
+            </div>
+            <div class="mirror-msg-body">Ты тратишь <b>18 000 ₽</b> на такси и доставку — это +32 часа сидя в неделю. Абонемент в зал стоит <b>2 500 ₽</b>, ходьба + готовка дома освободят <b>~8 000 ₽</b>.</div>
+          </div>
+          <div class="mirror-msg">
+            <div class="mirror-msg-head">
+              <span class="mirror-msg-tag">Эмоции</span>
+              <span class="mirror-msg-time">15 мин назад</span>
+            </div>
+            <div class="mirror-msg-body">За 3 месяца <b>87%</b> бюджета — еда и транспорт. Сколько в твоей жизни сейчас удовольствия — а не только обязательств?</div>
+          </div>
+          <div class="mirror-msg">
+            <div class="mirror-msg-head">
+              <span class="mirror-msg-tag">Паттерн</span>
+              <span class="mirror-msg-time">1 час назад</span>
+            </div>
+            <div class="mirror-msg-body">Каждую <b>пятницу</b> у тебя пик трат на доставку. Стресс-паттерн? Может, дело не в еде.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FEATURES ============ -->
+<section id="features">
+  <div class="container">
+    <div class="reveal">
+      <div class="sec-eyebrow"><span class="dash"></span>Возможности</div>
+      <h2 class="sec-title">Всё, что нужно — в одном месте.<br><span class="accent">Без лишнего.</span></h2>
+      <p class="sec-lead">Шесть ключевых ценностей FinPulse. Каждая — закрывает конкретную боль, которую не решают другие PFM в СНГ.</p>
+    </div>
+
+    <div class="features-grid reveal-stagger">
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12l3-9 3 6 3-3 3 9 3-6 3 6"/></svg>
+        </div>
+        <div class="feature-title">Финансовый пульс</div>
+        <div class="feature-desc">Health-score твоих финансов от 1 до 100. Один взгляд — и понимаешь, всё ли в порядке.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+        </div>
+        <div class="feature-title">Прогноз cash-flow</div>
+        <div class="feature-desc">«Что у тебя будет 30-го числа» — увидишь свой остаток вперёд, а не только пост-фактум.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 6h18M3 12h18M3 18h18"/><circle cx="7" cy="6" r="2" fill="currentColor"/><circle cx="14" cy="12" r="2" fill="currentColor"/><circle cx="10" cy="18" r="2" fill="currentColor"/></svg>
+        </div>
+        <div class="feature-title">Умные лимиты</div>
+        <div class="feature-desc">Бюджеты по категориям с напоминаниями. AI подскажет, какой лимит реалистичен — не из воздуха.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18M3 12h18"/></svg>
+        </div>
+        <div class="feature-title">Мульти-валюта СНГ</div>
+        <div class="feature-desc">KGS, RUB, KZT, USD, EUR + 30 валют. Счета в разных странах в одном окне.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><circle cx="17" cy="8" r="2.5"/><path d="M14.5 20c0-2 2-3.5 4-3.5s2.5 1.5 2.5 3.5"/></svg>
+        </div>
+        <div class="feature-title">Семейный бюджет</div>
+        <div class="feature-desc">Совместный бюджет с партнёром — бесплатно. Личное и общее, у каждого свой AI.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+        </div>
+        <div class="feature-title">Локальная приватность</div>
+        <div class="feature-desc">История и переписка с AI хранится на твоём устройстве. На сервер уходят только анонимные паттерны.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CALCULATOR ============ -->
+<section id="calc">
+  <div class="calc-section reveal">
+    <div class="sec-eyebrow center"><span class="dash"></span>Попробуй прямо сейчас</div>
+    <h2 class="sec-title center">Узнай свой <span class="accent">финансовый пульс</span><br>за 30 секунд</h2>
+    <p class="sec-lead center">Введи свои цифры или выбери шаблон. AI сразу покажет твой Пульс, прогноз и лайф-совет от Mirror. Без регистрации, всё работает в браузере.</p>
+
+    <div class="calc-mockup">
+      <div class="calc-mock-row">
+        <div class="mock-pulse-ring">
+          <svg width="64" height="64" viewBox="0 0 64 64">
+            <circle cx="32" cy="32" r="26" fill="none" stroke="rgba(255,255,255,0.10)" stroke-width="5"/>
+            <circle cx="32" cy="32" r="26" fill="none" stroke="#FFB422" stroke-width="5" stroke-linecap="round"
+              stroke-dasharray="163" stroke-dashoffset="40" transform="rotate(-90 32 32)"/>
+          </svg>
+          <div class="mock-pulse-num">76</div>
+        </div>
+        <div>
+          <div class="mock-cell-l">Финансовый пульс</div>
+          <div class="mock-cell-v">Здоровый ритм</div>
+        </div>
+        <div>
+          <div class="mock-cell-l">Остаток</div>
+          <div class="mock-cell-v gold">+38 000 ₽</div>
+        </div>
+        <div>
+          <div class="mock-cell-l">За год</div>
+          <div class="mock-cell-v">+456 000 ₽</div>
+        </div>
+      </div>
+    </div>
+
+    <a href="../04_calculator/calculator.html" target="_blank" class="calc-cta">
+      Открыть полный калькулятор
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </a>
+  </div>
+</section>
+
+<!-- ============ SECURITY ============ -->
+<section id="security">
+  <div class="security-section reveal">
+    <div class="sec-grid">
+      <div class="sec-text">
+        <div class="sec-eyebrow"><span class="dash"></span>Приватность</div>
+        <h2>Твои данные — <span class="accent">только твои</span>.</h2>
+        <p>Большинство финансовых приложений отправляют твою историю на сервер. FinPulse делает иначе — твоя жизнь остаётся на твоём устройстве. На облако уходят только анонимизированные паттерны.</p>
+      </div>
+      <div class="sec-features reveal-stagger">
+        <div class="sec-feature">
+          <div class="sec-feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+          </div>
+          <div class="sec-feature-text">
+            <div class="t">Локальное хранение</div>
+            <div class="d">История и AI-переписка — в зашифрованном хранилище на устройстве, не в облаке.</div>
+          </div>
+        </div>
+        <div class="sec-feature">
+          <div class="sec-feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7l8-4z"/></svg>
+          </div>
+          <div class="sec-feature-text">
+            <div class="t">End-to-end шифрование</div>
+            <div class="d">Все данные между устройствами шифруются ключом, который есть только у тебя.</div>
+          </div>
+        </div>
+        <div class="sec-feature">
+          <div class="sec-feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="9" r="4"/><path d="M5 21c1-4 4-6 7-6s6 2 7 6"/></svg>
+          </div>
+          <div class="sec-feature-text">
+            <div class="t">Личный AI у каждого</div>
+            <div class="d">В семейном режиме у каждого своя зона с AI. Партнёр видит общий бюджет, но не диалог.</div>
+          </div>
+        </div>
+        <div class="sec-feature">
+          <div class="sec-feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M16 4l4 4-12 12H4v-4L16 4z"/></svg>
+          </div>
+          <div class="sec-feature-text">
+            <div class="t">Open-source ядро</div>
+            <div class="d">Алгоритм категоризации и шифрования открыт — для проверки кем угодно.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PRICING ============ -->
+<section id="pricing">
+  <div class="container">
+    <div class="reveal" style="text-align:center">
+      <div class="sec-eyebrow center"><span class="dash"></span>Цены</div>
+      <h2 class="sec-title center">Честно. <span class="accent">Без сюрпризов.</span></h2>
+      <p class="sec-lead center">Все ключевые AI-фичи — в бесплатной версии. Pro — за безлимиты, продвинутые удобства и семейный план до 6 человек.</p>
+    </div>
+
+    <div class="pricing-grid reveal-stagger">
+      <div class="price-card">
+        <div class="price-name">FREE</div>
+        <div class="price-num"><span class="currency">₽</span>0</div>
+        <div class="price-period">навсегда</div>
+        <div class="price-yearly">Без ограничений по времени</div>
+        <div class="price-features">
+          <div class="price-feature"><span class="check">✓</span><div>Все AI-фичи: Lifestyle Mirror, прогноз cash-flow, инсайты «где сэкономить»</div></div>
+          <div class="price-feature"><span class="check">✓</span><div>Парсинг SMS банков СНГ + сканирование чеков</div></div>
+          <div class="price-feature"><span class="check">✓</span><div>До 5 счетов и 3 целей накоплений</div></div>
+          <div class="price-feature"><span class="check">✓</span><div>Семейный режим до 2 человек</div></div>
+          <div class="price-feature"><span class="check">✓</span><div>Локальное хранение + шифрование</div></div>
+          <div class="price-feature"><span class="check">✓</span><div>Без рекламы. Никогда.</div></div>
+        </div>
+        <button class="price-cta" onclick="alert('Скоро в App Store!')">Начать бесплатно</button>
+      </div>
+
+      <div class="price-card featured">
+        <div class="price-badge">Premium</div>
+        <div class="price-name">PRO</div>
+        <div class="price-num"><span class="currency">₽</span>499</div>
+        <div class="price-period">в месяц</div>
+        <div class="price-yearly">или 3 990 ₽/год — экономия 33%</div>
+        <div class="price-features">
+          <div class="price-feature"><span class="check">✓</span><div>Всё из Free плана</div></div>
+          <div class="price-feature"><span class="check">✓</span><div>Безлимит счетов и целей</div></div>
+          <div class="price-feature"><span class="check">✓</span><div>Семейный план до 6 человек</div></div>
+          <div class="price-feature"><span class="check">✓</span><div>Регулярные платежи + умные напоминания</div></div>
+          <div class="price-feature"><span class="check">✓</span><div>AI-инсайты в реальном времени (push)</div></div>
+          <div class="price-feature"><span class="check">✓</span><div>Travel-режим, Apple Watch, расширенные отчёты</div></div>
+          <div class="price-feature"><span class="check">✓</span><div>Приоритетная поддержка 24/7</div></div>
+        </div>
+        <button class="price-cta" onclick="alert('Скоро в App Store!')">Получить Pro</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section id="faq">
+  <div class="container-narrow">
+    <div class="reveal" style="text-align:center;margin-bottom:48px">
+      <div class="sec-eyebrow center"><span class="dash"></span>FAQ</div>
+      <h2 class="sec-title center">Частые <span class="accent">вопросы</span></h2>
+    </div>
+
+    <div class="faq-list reveal">
+      <div class="faq-item">
+        <button class="faq-q">Когда FinPulse выйдет в App Store?<span class="arrow">⌄</span></button>
+        <div class="faq-a"><div class="faq-a-inner">Запуск в App Store и Google Play планируется в Q3 2026 года. Сейчас идёт закрытое beta-тестирование с 1247 пользователями. Подпишись на ранний доступ — получишь приложение первым и 6 месяцев Pro бесплатно.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Как FinPulse работает с моими банками?<span class="arrow">⌄</span></button>
+        <div class="faq-a"><div class="faq-a-inner">На старте — через парсинг SMS и push-уведомлений. Это работает с любым банком, который шлёт уведомления (28+ банков СНГ протестированы). Поддержка читается локально на устройстве — мы не получаем доступ к вашему банковскому аккаунту. Прямые интеграции через Open Banking — в роадмапе на 2027.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Что с приватностью? Мои данные уйдут в облако?<span class="arrow">⌄</span></button>
+        <div class="faq-a"><div class="faq-a-inner">Вся история и переписка с AI хранится локально на твоём устройстве (iPhone Keychain или зашифрованное хранилище). На сервер уходят только анонимизированные паттерны для AI-обработки — без привязки к личности. Бэкап опционально на iCloud/Google Drive под ключом, который есть только у тебя. Open-source ядро шифрования — для проверки кем угодно.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Чем FinPulse отличается от Дзен-мани и CoinKeeper?<span class="arrow">⌄</span></button>
+        <div class="faq-a"><div class="faq-a-inner">Главное отличие — Lifestyle Mirror AI. Другие приложения показывают цифры. FinPulse объясняет, что эти цифры значат для твоей жизни — и даёт лайф-советы. Также: AI-инсайты у нас бесплатно (а не за подписку), семейный режим включён в Free, и нет рекламы даже в бесплатной версии.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Можно ли использовать FinPulse без подключения к банку?<span class="arrow">⌄</span></button>
+        <div class="faq-a"><div class="faq-a-inner">Да, можно вводить операции вручную или импортировать выписку CSV. Но автоматический парсинг SMS экономит до 80% времени и даёт более точную статистику. Сканирование чеков по QR-коду ФНС — тоже бесплатно.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Какие валюты поддерживаются?<span class="arrow">⌄</span></button>
+        <div class="faq-a"><div class="faq-a-inner">35+ валют, включая все валюты СНГ: KGS, RUB, KZT, UZS, BYN, AMD, AZN, MDL, GEL, TJS. Курсы обновляются в реальном времени, конвертация автоматическая. В Travel-режиме (Pro) — приложение временно ведёт траты в локальной валюте.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Можно ли вести семейный бюджет?<span class="arrow">⌄</span></button>
+        <div class="faq-a"><div class="faq-a-inner">Да, и это бесплатно для двоих. На Free-плане совместный бюджет на 2 человек, на Pro — до 6 (например, родители + дети с карманными деньгами). У каждого члена семьи своя приватная зона с AI — партнёр видит общий бюджет, но не твой личный диалог с Lifestyle Mirror.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Как отменить Pro-подписку?<span class="arrow">⌄</span></button>
+        <div class="faq-a"><div class="faq-a-inner">В 2 тапа в настройках, без «давайте мы вам ещё месяц бесплатно». Возврат за 30 дней — без вопросов. Это наша обещание прозрачности — никаких скрытых списаний, как у некоторых конкурентов.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CTA FINAL ============ -->
+<section id="cta">
+  <div class="cta-final reveal">
+    <div class="cta-final-inner">
+      <h2>Узнай свой <span class="accent">финансовый пульс</span></h2>
+      <p>Подпишись на ранний доступ — получишь FinPulse в день запуска и 6 месяцев Pro бесплатно.</p>
+      <div class="cta-final-row">
+        <button class="btn-store" onclick="alert('Скоро в App Store!')">
+          <svg class="store-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
+          <div class="store-meta"><span class="small">Скоро в</span><span class="big">App Store</span></div>
+        </button>
+        <button class="btn-store" onclick="alert('Скоро в Google Play!')">
+          <svg class="store-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.198l2.807 1.626a1 1 0 010 1.73l-2.808 1.626L15.69 12l1.998-1.99zm-12.7-8.84L17.392 9.69 15.09 11.99 4.998.69z"/></svg>
+          <div class="store-meta"><span class="small">Скоро в</span><span class="big">Google Play</span></div>
+        </button>
+        <a href="../04_calculator/calculator.html" target="_blank" class="btn-secondary">Попробовать демо</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-brand">
+          <div class="logo-mark"></div>
+          <div class="nav-brand-name">FinPulse</div>
+        </div>
+        <div class="foot-tagline">AI-зеркало твоей жизни через деньги. Финансы, которые понимают тебя.</div>
+      </div>
+      <div class="foot-col">
+        <h4>Продукт</h4>
+        <a href="#mirror">Lifestyle Mirror</a>
+        <a href="#features">Возможности</a>
+        <a href="#calc">Калькулятор</a>
+        <a href="#pricing">Цены</a>
+        <a href="#faq">FAQ</a>
+      </div>
+      <div class="foot-col">
+        <h4>Компания</h4>
+        <a href="#">О нас</a>
+        <a href="#">Блог</a>
+        <a href="#">Карьера</a>
+        <a href="#">Пресса</a>
+      </div>
+      <div class="foot-col">
+        <h4>Поддержка</h4>
+        <a href="#security">Безопасность</a>
+        <a href="#">Помощь</a>
+        <a href="#">Контакты</a>
+        <a href="#">Политика конф.</a>
+        <a href="#">Условия</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <div>© 2026 FinPulse. Все права защищены.</div>
+      <div>Сделано с ♥ для СНГ · Бишкек / Москва / Алматы</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Navbar shadow on scroll
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 12);
+  });
+
+  // FAQ accordion
+  document.querySelectorAll('.faq-q').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = btn.closest('.faq-item');
+      const wasOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+      if(!wasOpen) item.classList.add('open');
+    });
+  });
+
+  // Reveal on scroll
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if(e.isIntersecting){
+        e.target.classList.add('in');
+      }
+    });
+  }, {threshold: 0.12});
+  document.querySelectorAll('.reveal, .reveal-stagger').forEach(el => io.observe(el));
+
+  // Smooth scroll for nav links (already handled by html scroll-behavior)
+
+  // Service Worker registration
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW registration failed:', err));
+  }
+</script>
+</body>
+</html>
