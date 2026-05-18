@@ -794,6 +794,28 @@
   .item-spent-val{color:var(--text-2);font-weight:600}
   .item-spent-val.over{color:var(--danger)}
 
+  /* PRESET ROWS in sheet */
+  .preset-list{display:flex;flex-direction:column;gap:8px}
+  .preset-row{
+    display:flex;align-items:center;gap:14px;
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:14px;padding:16px;cursor:pointer;font-family:inherit;
+    text-align:left;width:100%;transition:all .15s;
+    min-height:72px;
+  }
+  @media(hover:hover){.preset-row:hover{border-color:var(--text);background:var(--surface-2)}}
+  .preset-row:active{transform:scale(0.99);border-color:var(--text);background:var(--surface-2)}
+  .preset-row-em{
+    width:44px;height:44px;border-radius:10px;
+    background:var(--surface-3);
+    display:flex;align-items:center;justify-content:center;
+    font-size:22px;flex-shrink:0;
+  }
+  .preset-row-text{flex:1;min-width:0}
+  .preset-row-name{font-size:16px;font-weight:700;color:var(--text);letter-spacing:-0.01em;margin-bottom:2px}
+  .preset-row-desc{font-size:13px;color:var(--text-3);font-weight:400}
+  .preset-row-arrow{color:var(--text-3);font-size:20px;font-weight:300;flex-shrink:0}
+
   /* RECENT TX MINI-LIST in sheet */
   .recent-tx{
     margin-bottom:16px;
@@ -829,6 +851,8 @@
       padding:max(16px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) 0 max(16px,env(safe-area-inset-left));
     }
     .topbar{margin-bottom:32px;padding-bottom:16px}
+    .badge-live{display:none}
+    .brand-name span{display:none}
     h1.hero-h{font-size:40px;letter-spacing:-0.035em;line-height:1.05;margin-bottom:16px}
     .hero{padding-top:8px;margin-bottom:48px}
     .hero-lead{font-size:15px;line-height:1.5}
@@ -908,7 +932,7 @@
     </div>
     <div class="topbar-right">
       <span class="badge-live"><span class="dot"></span>Live demo</span>
-      <button class="btn-ghost" onclick="resetAll()">↺ Reset</button>
+      <button class="btn-ghost" id="open-preset-sheet" aria-label="Загрузить шаблон">📋 Шаблон</button>
     </div>
   </div>
 
@@ -947,36 +971,6 @@
         <div class="ps-l">За год</div>
         <div class="ps-v" id="k-year">—</div>
       </div>
-    </div>
-  </section>
-
-  <!-- PRESETS -->
-  <section class="sec">
-    <div class="sec-h">
-      <h2>Быстрый старт</h2>
-      <div class="sec-sub">Выбери похожий профиль — данные подставятся автоматически</div>
-    </div>
-    <div class="presets-grid">
-      <button class="preset" data-preset="student">
-        <div class="preset-emoji">🎓</div>
-        <div class="preset-name">Студент</div>
-        <div class="preset-desc">Доход ~30 000 ₽</div>
-      </button>
-      <button class="preset" data-preset="spec">
-        <div class="preset-emoji">💼</div>
-        <div class="preset-name">Специалист</div>
-        <div class="preset-desc">Доход ~95 000 ₽</div>
-      </button>
-      <button class="preset" data-preset="family">
-        <div class="preset-emoji">👨‍👩‍👧</div>
-        <div class="preset-name">Семья</div>
-        <div class="preset-desc">Доход ~200 000 ₽</div>
-      </button>
-      <button class="preset" data-preset="top">
-        <div class="preset-emoji">💎</div>
-        <div class="preset-name">Топ-менеджер</div>
-        <div class="preset-desc">Доход ~400 000 ₽</div>
-      </button>
     </div>
   </section>
 
@@ -1365,6 +1359,54 @@
   </div>
 </div>
 
+<!-- PRESET SHEET -->
+<div class="sheet-backdrop" id="preset-backdrop"></div>
+<div class="sheet" id="preset-sheet" role="dialog" aria-modal="true" aria-labelledby="preset-title">
+  <div class="sheet-grab"></div>
+  <div class="sheet-head">
+    <div class="sheet-title" id="preset-title">Загрузить шаблон</div>
+    <button class="sheet-close" id="preset-close" aria-label="Закрыть">✕</button>
+  </div>
+  <div class="mode-hint" style="margin-top:0;margin-bottom:18px;text-align:left">
+    Выбери похожий профиль — данные подставятся автоматически. Это заменит текущие цифры и удалит все траты этого месяца.
+  </div>
+
+  <div class="preset-list">
+    <button class="preset-row" data-preset="student">
+      <div class="preset-row-em">🎓</div>
+      <div class="preset-row-text">
+        <div class="preset-row-name">Студент</div>
+        <div class="preset-row-desc">Доход ~30 000 ₽ · подработка + стипендия</div>
+      </div>
+      <div class="preset-row-arrow">›</div>
+    </button>
+    <button class="preset-row" data-preset="spec">
+      <div class="preset-row-em">💼</div>
+      <div class="preset-row-text">
+        <div class="preset-row-name">Специалист</div>
+        <div class="preset-row-desc">Доход ~95 000 ₽ · зарплата + фриланс</div>
+      </div>
+      <div class="preset-row-arrow">›</div>
+    </button>
+    <button class="preset-row" data-preset="family">
+      <div class="preset-row-em">👨‍👩‍👧</div>
+      <div class="preset-row-text">
+        <div class="preset-row-name">Семья</div>
+        <div class="preset-row-desc">Доход ~200 000 ₽ · двое + ребёнок</div>
+      </div>
+      <div class="preset-row-arrow">›</div>
+    </button>
+    <button class="preset-row" data-preset="top">
+      <div class="preset-row-em">💎</div>
+      <div class="preset-row-text">
+        <div class="preset-row-name">Топ-менеджер</div>
+        <div class="preset-row-desc">Доход ~400 000 ₽ · зарплата + дивиденды</div>
+      </div>
+      <div class="preset-row-arrow">›</div>
+    </button>
+  </div>
+</div>
+
 <!-- STICKY -->
 <div class="sticky-bar" id="sticky">
   <div class="sb-pulse"><div class="sb-dot" id="sb-dot"></div><span>Пульс<b id="sb-pulse">—</b><span class="sim-label">SIM</span></span></div>
@@ -1528,15 +1570,29 @@
     renderAll(); update();
   });
 
-  document.querySelectorAll('.preset').forEach(b => b.addEventListener('click', () => {
+  // Preset sheet open/close + selection
+  const $presetSheet = document.getElementById('preset-sheet');
+  const $presetBackdrop = document.getElementById('preset-backdrop');
+  function openPresetSheet(){
+    $presetBackdrop.classList.add('show');
+    $presetSheet.classList.add('show');
+  }
+  function closePresetSheet(){
+    $presetBackdrop.classList.remove('show');
+    $presetSheet.classList.remove('show');
+  }
+  document.getElementById('open-preset-sheet').addEventListener('click', openPresetSheet);
+  document.getElementById('preset-close').addEventListener('click', closePresetSheet);
+  $presetBackdrop.addEventListener('click', closePresetSheet);
+
+  document.querySelectorAll('.preset-row').forEach(b => b.addEventListener('click', () => {
+    // Switching profile resets this month's transactions
+    transactions = transactions.filter(t => !isThisMonth(t.ts));
+    saveTx();
     applyPreset(b.dataset.preset);
+    closePresetSheet();
     document.querySelector('.data-grid').scrollIntoView({behavior:'smooth', block:'start'});
   }));
-
-  function resetAll(){
-    if(!confirm('Сбросить все данные?')) return;
-    applyPreset('spec');
-  }
 
   function calcPulse(income, total, e){
     if(income <= 0) return 0;
