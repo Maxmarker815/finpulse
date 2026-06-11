@@ -2,10 +2,22 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="refresh" content="0; url=04_calculator/calculator.html">
-<link rel="canonical" href="04_calculator/calculator.html">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FinPulse</title>
 </head>
 <body>
-<script>window.location.replace("04_calculator/calculator.html");</script>
+<script>
+  // Телефон → трекер (мобильный ввод). Ноутбук/ПК → Состояние (десктоп-обзор).
+  (function(){
+    var ua = navigator.userAgent || '';
+    var uaMobile = /Mobi|Android|iPhone|iPod|iPad|Windows Phone|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+    var smallScreen = Math.min(window.innerWidth || 9999, (window.screen && window.screen.width) || 9999) <= 820;
+    var isMobile = uaMobile || (('ontouchstart' in window) && smallScreen);
+    window.location.replace(isMobile ? '06_tracker/tracker.html' : '06_tracker/dashboard.html');
+  })();
+</script>
+<noscript>
+  <p>Открой <a href="06_tracker/tracker.html">трекер (телефон)</a> или <a href="06_tracker/dashboard.html">Состояние (компьютер)</a>.</p>
+</noscript>
 </body>
 </html>

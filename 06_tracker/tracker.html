@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>FinPulse · Трекер</title>
+<meta name="description" content="Личный учёт расходов FinPulse: дневной лимит, траты по дням, локальное хранение.">
+<link rel="manifest" href="../manifest.json">
+<meta name="theme-color" content="#09090B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FinPulse">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%23FFB422' width='192' height='192'/><circle cx='96' cy='96' r='48' fill='%23FFFFFF'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* ===== Палитра и токены — взяты из 04_calculator/calculator.html ===== */
+  :root{
+    --bg:#FFFFFF;
+    --surface:#FFFFFF;
+    --surface-2:#FAFAFA;
+    --surface-3:#F4F4F5;
+    --border:#E8E8EA;
+    --border-strong:#D4D4D8;
+    --border-faint:#F1F1F3;
+
+    --text:#09090B;
+    --text-2:#52525B;
+    --text-3:#A1A1AA;
+    --text-4:#D4D4D8;
+
+    --gold:#FFB422;
+    --gold-bright:#FFC547;
+    --gold-deep:#C97E00;
+    --gold-text:#946100;
+    --gold-subtle:rgba(255,180,34,0.10);
+    --gold-soft:rgba(255,180,34,0.20);
+    --gold-border:rgba(255,180,34,0.45);
+
+    --danger:#DC2626;
+    --danger-subtle:rgba(220,38,38,0.08);
+    --success:#16A34A;
+
+    --sh-card:0 1px 2px rgba(0,0,0,0.04);
+    --sh-hover:0 8px 24px rgba(0,0,0,0.06);
+    --sh-pop:0 24px 48px rgba(0,0,0,0.08);
+    --sh-gold:0 8px 20px rgba(255,180,34,0.32);
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+  body{
+    background:var(--surface-2);
+    color:var(--text);
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sans-serif;
+    line-height:1.5;
+    font-feature-settings:'cv02','cv03','cv04','cv11','ss01';
+    min-height:100vh;
+    font-weight:400;
+    letter-spacing:-0.005em;
+    -webkit-tap-highlight-color:transparent;
+    padding:max(16px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) calc(40px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));
+  }
+  .num{font-variant-numeric:tabular-nums;font-feature-settings:'tnum'}
+
+  .wrap{max-width:520px;margin:0 auto}
+
+  /* ===== Topbar ===== */
+  .topbar{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:8px 4px 20px;
+  }
+  .brand{display:flex;align-items:center;gap:10px}
+  .logo-mark{
+    width:24px;height:24px;border-radius:6px;background:var(--text);
+    position:relative;display:flex;align-items:center;justify-content:center;
+  }
+  .logo-mark::after{content:"";width:8px;height:8px;border-radius:50%;background:var(--gold)}
+  .brand-name{font-size:16px;font-weight:600;letter-spacing:-0.015em;color:var(--text)}
+  .brand-name span{color:var(--text-3);font-weight:400}
+  .topbar a.calc-link{
+    font-size:12px;font-weight:500;color:var(--text-3);text-decoration:none;
+    padding:7px 11px;border:1px solid var(--border);border-radius:8px;transition:all .15s;
+  }
+  @media(hover:hover){.topbar a.calc-link:hover{color:var(--text-2);border-color:var(--border-strong)}}
+
+  /* сводка-бар с живым пульс-кольцом (как в дашборде), из реальных трат */
+  .strip{background:var(--text);color:#fff;border-radius:14px;padding:16px 18px;margin-bottom:16px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;box-shadow:var(--sh-card)}
+  .strip-pulse{display:flex;align-items:center;gap:12px;flex:none}
+  .pring{position:relative;width:60px;height:60px;flex:none}
+  .pring svg{transform:rotate(-90deg)}
+  .pring-bg{fill:none;stroke:rgba(255,255,255,.10);stroke-width:5}
+  .pring-fg{fill:none;stroke:var(--gold);stroke-width:5;stroke-linecap:round;transition:stroke-dashoffset .9s cubic-bezier(.22,1,.36,1),stroke .3s}
+  .pring-num{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:18px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums}
+  .strip .k{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.5);font-weight:500;margin-bottom:3px}
+  .strip .sv{font-size:16px;font-weight:600;color:#fff;letter-spacing:-0.01em;font-variant-numeric:tabular-nums}
+  .strip-meta .sv{font-size:13.5px}
+  .strip-cell{flex:1;min-width:88px}
+
+  .card{
+    background:var(--surface);border:1px solid var(--border);border-radius:14px;
+    box-shadow:var(--sh-card);padding:20px;margin-bottom:16px;
+  }
+
+  /* ===== Карточка дня (главный индикатор) ===== */
+  .daynav{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+  .daynav button{
+    width:44px;height:44px;border-radius:10px;border:1px solid var(--border);
+    background:var(--surface);color:var(--text-2);font-size:16px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;transition:all .15s;
+  }
+  .daynav button:disabled{opacity:.35;cursor:default}
+  @media(hover:hover){.daynav button:not(:disabled):hover{background:var(--surface-2);color:var(--text);border-color:var(--border-strong)}}
+  .daynav .label{font-size:14px;font-weight:600;color:var(--text);letter-spacing:-0.01em;background:none;border:none;font-family:inherit;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:6px 8px;border-radius:8px;transition:background .12s}
+  @media(hover:hover){.daynav .label:hover{background:var(--surface-2)}}
+  .cal-caret{font-size:10px;color:var(--text-3)}
+
+  /* календарь-тепловая карта (текущий месяц) */
+  .cal{margin-bottom:18px;border:1px solid var(--border-faint);border-radius:12px;padding:12px;background:var(--surface-2)}
+  .cal[hidden]{display:none}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+  .cal-dow{font-size:10px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;color:var(--text-3);text-align:center;padding:2px 0}
+  .cal-cell{aspect-ratio:1;min-height:36px;border-radius:8px;border:1px solid transparent;background:var(--surface);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;font-size:13px;font-weight:500;color:var(--text-2);font-family:inherit;transition:border-color .12s}
+  .cal-cell.empty{visibility:hidden;cursor:default}
+  .cal-cell.nospend{color:var(--text-3)}
+  .cal-cell.under{background:rgba(22,163,74,.10);color:var(--success);border-color:rgba(22,163,74,.25)}
+  .cal-cell.over{background:var(--danger-subtle);color:var(--danger);border-color:rgba(220,38,38,.25)}
+  .cal-cell.today{font-weight:800}
+  .cal-cell.sel{outline:2px solid var(--gold);outline-offset:-2px}
+  .cal-cell .dd{line-height:1}
+  .cal-cell .amt{font-size:8.5px;font-weight:600;margin-top:2px;font-variant-numeric:tabular-nums}
+  @media(hover:hover){.cal-cell:not(.empty):hover{border-color:var(--border-strong)}}
+  .cal-legend{display:flex;gap:14px;justify-content:center;margin-top:10px;font-size:10.5px;color:var(--text-3)}
+  .cal-legend i{display:inline-block;width:8px;height:8px;border-radius:3px;margin-right:4px;vertical-align:middle}
+
+  .summary .lead{font-size:12px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;color:var(--text-3);margin-bottom:6px}
+  .summary .big{font-size:44px;font-weight:700;letter-spacing:-0.03em;line-height:1.05;color:var(--text)}
+  .summary .big.over{color:var(--danger)}
+  .summary .big .cur{font-size:22px;font-weight:600;color:var(--text-3);margin-left:4px}
+  .summary .sub{font-size:13px;color:var(--text-2);margin-top:8px}
+  .summary .sub b{font-weight:600;color:var(--text)}
+
+  .bar{height:8px;border-radius:6px;background:var(--surface-3);margin-top:16px;overflow:hidden}
+  .bar > i{display:block;height:100%;border-radius:6px;background:var(--gold);transition:width .25s ease}
+  .bar > i.over{background:var(--danger)}
+  .overnote{margin-top:10px;font-size:12.5px;font-weight:600;color:var(--danger);display:none}
+  .overnote.show{display:block}
+
+  /* ===== Общий остаток ===== */
+  .balance .bal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+  .bal-lead{font-size:12px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;color:var(--text-3)}
+  .bal-edit{background:none;border:none;color:var(--text-3);font-family:inherit;font-size:12px;font-weight:500;cursor:pointer;padding:2px 0}
+  .bal-edit:hover{color:var(--text-2)}
+  .bal-big{font-size:28px;font-weight:700;letter-spacing:-0.02em;color:var(--text)}
+  .bal-big.over{color:var(--danger)}
+  .bal-big .cur{font-size:15px;font-weight:600;color:var(--text-3);margin-left:4px}
+  .bal-sub{font-size:12.5px;color:var(--text-2);margin-top:6px}
+  .bal-editrow{display:none;gap:8px;margin-top:14px}
+  .bal-editrow.show{display:flex}
+  .bal-editrow input{flex:1}
+  .bal-editrow button{
+    flex:none;font-family:inherit;font-size:14px;font-weight:600;color:var(--text);
+    background:var(--gold);border:none;border-radius:10px;padding:0 18px;cursor:pointer;min-height:48px;
+  }
+
+  /* ===== Форма ===== */
+  .form-title{font-size:13px;font-weight:600;color:var(--text-2);margin-bottom:14px;letter-spacing:-0.01em}
+  .field{margin-bottom:14px}
+  .field label{display:block;font-size:11.5px;font-weight:500;letter-spacing:.03em;text-transform:uppercase;color:var(--text-3);margin-bottom:7px}
+  input[type=number],input[type=text],input[type=date]{
+    width:100%;font-family:inherit;font-size:16px;color:var(--text);
+    background:var(--surface-2);border:1px solid var(--border);border-radius:10px;
+    padding:13px 14px;transition:border-color .15s,background .15s;min-height:48px;
+  }
+  input:focus{outline:none;border-color:var(--gold-border);background:var(--surface)}
+  input::placeholder{color:var(--text-3)}
+  .amount-input{font-size:24px;font-weight:600;letter-spacing:-0.01em}
+
+  .cats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .cat{
+    display:flex;flex-direction:column;align-items:center;gap:5px;
+    padding:11px 4px;border:1px solid var(--border);border-radius:10px;
+    background:var(--surface-2);cursor:pointer;transition:all .15s;
+  }
+  .cat .emo{font-size:20px;line-height:1}
+  .cat .nm{font-size:11px;font-weight:500;color:var(--text-2)}
+  .cat.active{border-color:var(--gold-border);background:var(--gold-subtle)}
+  .cat.active .nm{color:var(--gold-text);font-weight:600}
+  @media(hover:hover){.cat:not(.active):hover{border-color:var(--border-strong)}}
+
+  .btn-add{
+    width:100%;margin-top:4px;font-family:inherit;font-size:15px;font-weight:600;
+    color:var(--text);background:var(--gold);border:none;border-radius:11px;
+    padding:15px;cursor:pointer;min-height:52px;box-shadow:var(--sh-card);
+    transition:transform .12s,filter .15s;letter-spacing:-0.01em;
+  }
+  .btn-add:active{transform:scale(.99)}
+  @media(hover:hover){.btn-add:hover{filter:brightness(1.03)}}
+
+  .date-toggle{
+    background:none;border:none;color:var(--text-3);font-family:inherit;
+    font-size:12px;font-weight:500;cursor:pointer;padding:4px 0;margin-top:2px;
+  }
+  .date-toggle:hover{color:var(--text-2)}
+  .date-row{display:none}
+  .date-row.show{display:block}
+
+  /* живая подсказка перед добавлением */
+  .hint{display:none;margin:0 0 14px;padding:11px 13px;border-radius:10px;font-size:12.5px;line-height:1.45;border:1px solid transparent}
+  .hint.ok,.hint.warn,.hint.danger{display:block}
+  .hint.ok{background:var(--surface-3);color:var(--text-2);border-color:var(--border)}
+  .hint.warn{background:var(--gold-subtle);color:var(--gold-text);border-color:var(--gold-border)}
+  .hint.danger{background:var(--danger-subtle);color:var(--danger);border-color:rgba(220,38,38,0.25)}
+  .hint .hint-main{font-weight:600}
+  .hint .hint-sub{margin-top:3px;opacity:.85}
+
+  /* ===== Список ===== */
+  .list-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px}
+  .list-head .t{font-size:13px;font-weight:600;color:var(--text-2)}
+  .list-head .c{font-size:12px;color:var(--text-3)}
+  .empty{text-align:center;color:var(--text-3);font-size:13.5px;padding:24px 0}
+  .row{
+    display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--border-faint);
+  }
+  .row:first-child{border-top:none}
+  .row .emo{
+    width:38px;height:38px;flex:none;border-radius:9px;background:var(--surface-3);
+    display:flex;align-items:center;justify-content:center;font-size:18px;
+  }
+  .row .meta{flex:1;min-width:0}
+  .row .meta .cat-nm{font-size:14px;font-weight:500;color:var(--text)}
+  .row .meta .cmt{font-size:12.5px;color:var(--text-3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .row .amt{font-size:15px;font-weight:600;color:var(--text);white-space:nowrap}
+  .row .del{
+    width:44px;height:44px;flex:none;border:none;background:none;color:var(--text-4);
+    font-size:18px;cursor:pointer;border-radius:7px;display:flex;align-items:center;justify-content:center;transition:all .15s;
+  }
+  @media(hover:hover){.row .del:hover{background:var(--danger-subtle);color:var(--danger)}}
+
+  .footnote{text-align:center;font-size:11.5px;color:var(--text-4);margin-top:18px;line-height:1.5}
+
+  @media(max-width:400px){
+    .strip-pulse{flex-basis:100%;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.10)}
+    .strip-cell{min-width:0}
+    .summary .big{font-size:38px}
+    .bal-big{font-size:24px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="logo-mark"></div>
+      <div class="brand-name">FinPulse <span>· трекер</span></div>
+    </div>
+    <a class="calc-link" href="dashboard.html">Состояние →</a>
+  </div>
+
+  <!-- Сводка с живым пульсом (из реальных трат) -->
+  <div class="strip">
+    <div class="strip-pulse">
+      <div class="pring">
+        <svg width="60" height="60" viewBox="0 0 60 60">
+          <circle class="pring-bg" cx="30" cy="30" r="24"></circle>
+          <circle class="pring-fg" id="pringFg" cx="30" cy="30" r="24" stroke-dasharray="150.8" stroke-dashoffset="150.8"></circle>
+        </svg>
+        <div class="pring-num" id="stripPulse">—</div>
+      </div>
+      <div class="strip-meta">
+        <div class="k">Пульс</div>
+        <div class="sv" id="stripStatus">—</div>
+      </div>
+    </div>
+    <div class="strip-cell"><div class="k">Сбережения</div><div class="sv" id="stripRemain">—</div></div>
+    <div class="strip-cell"><div class="k">Хватит на</div><div class="sv" id="stripRunway">—</div></div>
+  </div>
+
+  <!-- Карточка дня -->
+  <div class="card summary">
+    <div class="daynav">
+      <button id="prevDay" aria-label="Предыдущий день">‹</button>
+      <button class="label" id="dayLabel"><span id="dayLabelText">Сегодня</span><span class="cal-caret">▾</span></button>
+      <button id="nextDay" aria-label="Следующий день">›</button>
+    </div>
+    <div class="cal" id="cal" hidden></div>
+    <div class="lead">Осталось от лимита</div>
+    <div class="big num" id="remain">1 000<span class="cur">сом</span></div>
+    <div class="sub">Потрачено <b class="num" id="spent">0</b> из <b class="num">1 000</b> сом</div>
+    <div class="bar"><i id="barFill" style="width:0%"></i></div>
+    <div class="overnote" id="overnote"></div>
+  </div>
+
+  <!-- Общий остаток -->
+  <div class="card balance">
+    <div class="bal-head">
+      <span class="bal-lead">Общий остаток</span>
+      <button class="bal-edit" id="balEdit">изменить</button>
+    </div>
+    <div class="bal-big num" id="balRemain">30 000<span class="cur">сом</span></div>
+    <div class="bal-sub num" id="balSub">из 30 000 · потрачено 0</div>
+    <div class="bal-editrow" id="balEditRow">
+      <input id="balInput" type="number" inputmode="numeric" min="0" step="1" placeholder="30000" autocomplete="off">
+      <button id="balSave">Сохранить</button>
+    </div>
+  </div>
+
+  <!-- Форма -->
+  <div class="card">
+    <div class="form-title">Новая трата</div>
+    <div class="field">
+      <label for="amount">Сумма, сом</label>
+      <input class="amount-input num" id="amount" type="number" inputmode="numeric" min="0" step="1" placeholder="0" autocomplete="off">
+    </div>
+    <div class="field">
+      <label>Категория</label>
+      <div class="cats" id="cats"></div>
+    </div>
+    <div class="field">
+      <label for="comment">Комментарий</label>
+      <input id="comment" type="text" placeholder="необязательно" autocomplete="off" maxlength="80">
+    </div>
+    <button class="date-toggle" id="dateToggle">Изменить дату (сейчас — сегодня)</button>
+    <div class="field date-row" id="dateRow">
+      <input id="date" type="date">
+    </div>
+    <div class="hint" id="hint"></div>
+    <button class="btn-add" id="addBtn">Добавить трату</button>
+  </div>
+
+  <!-- Список -->
+  <div class="card">
+    <div class="list-head">
+      <div class="t">Траты за день</div>
+      <div class="c num" id="listCount">0</div>
+    </div>
+    <div id="list"></div>
+  </div>
+
+  <div class="footnote">Данные хранятся только в этом браузере (localStorage).<br>Дневной лимит — 1000 сом.</div>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var LIMIT = 1000;
+  var KEY = 'finpulse_tracker_v1';
+  var SKEY = 'finpulse_tracker_settings_v1';
+  var DEFAULT_BALANCE = 30000;
+
+  var CATS = [
+    {id:'food',      label:'Еда',       emoji:'🍴'},
+    {id:'cafe',      label:'Кафе',      emoji:'☕'},
+    {id:'transport', label:'Транспорт', emoji:'🚕'},
+    {id:'other',     label:'Другое',    emoji:'🛍'}
+  ];
+
+  // ---- состояние ----
+  var entries = load();
+  var settings = loadSettings();
+  var selectedCat = 'food';
+  var viewDate = todayStr();
+
+  // ---- хелперы дат (локальные, без UTC-сдвига) ----
+  function todayStr(){
+    var d = new Date();
+    return ymd(d);
+  }
+  function ymd(d){
+    var m = String(d.getMonth()+1).padStart(2,'0');
+    var day = String(d.getDate()).padStart(2,'0');
+    return d.getFullYear()+'-'+m+'-'+day;
+  }
+  function shiftDay(str, delta){
+    var p = str.split('-');
+    var d = new Date(+p[0], +p[1]-1, +p[2]);
+    d.setDate(d.getDate()+delta);
+    return ymd(d);
+  }
+  // первый день текущего (настоящего) месяца — граница навигации трекера
+  function monthStartStr(){ var d = new Date(); return ymd(new Date(d.getFullYear(), d.getMonth(), 1)); }
+  var MONTHS = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+  function humanDay(str){
+    if(str === todayStr()) return 'Сегодня';
+    if(str === shiftDay(todayStr(),-1)) return 'Вчера';
+    var p = str.split('-');
+    return (+p[2]) + ' ' + MONTHS[+p[1]-1];
+  }
+
+  // ---- хранилище ----
+  function load(){
+    try{
+      var raw = localStorage.getItem(KEY);
+      var arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr : [];
+    }catch(e){ return []; }
+  }
+  function save(){
+    try{ localStorage.setItem(KEY, JSON.stringify(entries)); }
+    catch(e){ alert('Не удалось сохранить — возможно, переполнено хранилище браузера.'); }
+  }
+  function loadSettings(){
+    try{
+      var raw = localStorage.getItem(SKEY);
+      var o = raw ? JSON.parse(raw) : {};
+      if(typeof o.startBalance !== 'number') o.startBalance = DEFAULT_BALANCE;
+      return o;
+    }catch(e){ return {startBalance:DEFAULT_BALANCE}; }
+  }
+  function saveSettings(){
+    try{ localStorage.setItem(SKEY, JSON.stringify(settings)); }catch(e){}
+  }
+
+  // ---- формат чисел ----
+  function fmt(n){ return Math.round(n).toLocaleString('ru-RU'); }
+
+  // ---- категории (рендер чипов) ----
+  function catById(id){
+    for(var i=0;i<CATS.length;i++){ if(CATS[i].id===id) return CATS[i]; }
+    return CATS[CATS.length-1];
+  }
+  function buildCats(){
+    var box = document.getElementById('cats');
+    box.innerHTML = '';
+    CATS.forEach(function(c){
+      var el = document.createElement('div');
+      el.className = 'cat' + (c.id===selectedCat ? ' active' : '');
+      el.innerHTML = '<span class="emo">'+c.emoji+'</span><span class="nm">'+c.label+'</span>';
+      el.addEventListener('click', function(){
+        selectedCat = c.id;
+        buildCats();
+      });
+      box.appendChild(el);
+    });
+  }
+
+  // ---- рендер ----
+  function dayEntries(){
+    return entries.filter(function(e){ return e.date === viewDate; });
+  }
+  function render(){
+    var list = dayEntries();
+    var spent = list.reduce(function(s,e){ return s + (+e.amount||0); }, 0);
+    var remain = LIMIT - spent;
+    var over = spent > LIMIT;
+
+    document.getElementById('dayLabelText').textContent = humanDay(viewDate);
+    document.getElementById('nextDay').disabled = (viewDate === todayStr());
+    document.getElementById('prevDay').disabled = (viewDate <= monthStartStr());
+    var calEl = document.getElementById('cal');
+    if(calEl && !calEl.hidden) buildCalendar();
+
+    var bigEl = document.getElementById('remain');
+    bigEl.classList.toggle('over', over);
+    bigEl.innerHTML = fmt(Math.abs(remain)) + '<span class="cur">сом</span>';
+    document.querySelector('.summary .lead').textContent = over ? 'Перерасход' : 'Осталось от лимита';
+
+    document.getElementById('spent').textContent = fmt(spent);
+
+    var pct = Math.min(100, Math.round(spent / LIMIT * 100));
+    var fill = document.getElementById('barFill');
+    fill.style.width = pct + '%';
+    fill.classList.toggle('over', over);
+
+    var note = document.getElementById('overnote');
+    if(over){ note.classList.add('show'); note.textContent = 'Превышение на ' + fmt(spent - LIMIT) + ' сом'; }
+    else { note.classList.remove('show'); }
+
+    // общий остаток (по всей истории, не зависит от выбранного дня)
+    var totalAll = entries.reduce(function(s,e){ return s + (+e.amount||0); }, 0);
+    var balRemain = settings.startBalance - totalAll;
+    var balEl = document.getElementById('balRemain');
+    balEl.classList.toggle('over', balRemain < 0);
+    balEl.innerHTML = (balRemain < 0 ? '−' : '') + fmt(Math.abs(balRemain)) + '<span class="cur">сом</span>';
+    document.getElementById('balSub').textContent = 'из ' + fmt(settings.startBalance) + ' · потрачено ' + fmt(totalAll);
+
+    // ---- сводка-бар: пульс / остаток / запас (только реальные траты) ----
+    var todayTotal = entries.reduce(function(s,e){ return e.date===todayStr() ? s + (+e.amount||0) : s; }, 0);
+    var daysSeen = {}; entries.forEach(function(e){ daysSeen[e.date] = true; });
+    var daysTracked = Object.keys(daysSeen).length;
+    var avgDaily = daysTracked > 0 ? totalAll / daysTracked : 0;
+    var runwayDays = avgDaily > 0 ? Math.floor(Math.max(0, balRemain) / avgDaily) : null;
+
+    var pulse;
+    if(avgDaily <= 0){ pulse = 70; }
+    else {
+      var rw = balRemain / avgDaily;
+      if(rw >= 45) pulse = 90; else if(rw >= 30) pulse = 78; else if(rw >= 20) pulse = 62;
+      else if(rw >= 12) pulse = 46; else if(rw >= 7) pulse = 30; else pulse = 15;
+    }
+    if(todayTotal > LIMIT) pulse -= 15;
+    else if(todayTotal > 0 && todayTotal <= LIMIT*0.5) pulse += 4;
+    if(balRemain < 0) pulse = Math.min(pulse, 5);
+    pulse = Math.max(1, Math.min(100, Math.round(pulse)));
+
+    var R = 150.8; // длина окружности r=24 (2π·24)
+    var fg = document.getElementById('pringFg');
+    if(entries.length === 0){
+      document.getElementById('stripPulse').textContent = '—';
+      document.getElementById('stripStatus').textContent = 'Нет данных';
+      fg.setAttribute('stroke-dashoffset', R.toFixed(1));
+      fg.style.stroke = 'rgba(255,255,255,.25)';
+    } else {
+      document.getElementById('stripPulse').textContent = pulse;
+      document.getElementById('stripStatus').textContent =
+        pulse>=85?'Отличный ритм':pulse>=70?'Здоровый ритм':pulse>=55?'Стабильно':pulse>=40?'Требует внимания':pulse>=25?'Аритмия трат':'Нужен план';
+      fg.setAttribute('stroke-dashoffset', (R - (pulse/100)*R).toFixed(1));
+      fg.style.stroke = pulse >= 70 ? 'var(--success)' : (pulse >= 40 ? 'var(--gold)' : 'var(--danger)');
+    }
+    document.getElementById('stripRemain').textContent = (balRemain < 0 ? '−' : '') + fmt(Math.abs(balRemain)) + ' сом';
+    document.getElementById('stripRunway').textContent = (runwayDays == null) ? '—' : ('~' + runwayDays + ' дн');
+
+    // список
+    document.getElementById('listCount').textContent = list.length;
+    var box = document.getElementById('list');
+    box.innerHTML = '';
+    if(list.length === 0){
+      box.innerHTML = '<div class="empty">Пока пусто. Добавь первую трату.</div>';
+      return;
+    }
+    // новые сверху
+    list.slice().reverse().forEach(function(e){
+      var c = catById(e.category);
+      var row = document.createElement('div');
+      row.className = 'row';
+      var cmt = e.comment ? '<div class="cmt">'+escapeHtml(e.comment)+'</div>' : '';
+      row.innerHTML =
+        '<div class="emo">'+c.emoji+'</div>' +
+        '<div class="meta"><div class="cat-nm">'+c.label+'</div>'+cmt+'</div>' +
+        '<div class="amt num">'+fmt(e.amount)+'</div>' +
+        '<button class="del" aria-label="Удалить">×</button>';
+      row.querySelector('.del').addEventListener('click', function(){ removeEntry(e.id); });
+      box.appendChild(row);
+    });
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, function(ch){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];
+    });
+  }
+
+  // ---- календарь-тепловая карта (текущий месяц) ----
+  function dayTotal(dateStr){
+    return entries.reduce(function(s,e){ return e.date === dateStr ? s + (+e.amount||0) : s; }, 0);
+  }
+  function buildCalendar(){
+    var cal = document.getElementById('cal');
+    var now = new Date();
+    var year = now.getFullYear(), month = now.getMonth();
+    var startDow = (new Date(year, month, 1).getDay() + 6) % 7; // Пн=0
+    var days = new Date(year, month + 1, 0).getDate();
+    var todayS = todayStr();
+    var html = '<div class="cal-grid">';
+    ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'].forEach(function(d){ html += '<div class="cal-dow">' + d + '</div>'; });
+    for(var i = 0; i < startDow; i++){ html += '<div class="cal-cell empty"></div>'; }
+    for(var d = 1; d <= days; d++){
+      var ds = ymd(new Date(year, month, d));
+      var spent = dayTotal(ds);
+      var cls = 'cal-cell ' + (spent > LIMIT ? 'over' : (spent > 0 ? 'under' : 'nospend'));
+      if(ds === todayS) cls += ' today';
+      if(ds === viewDate) cls += ' sel';
+      var amt = spent > 0 ? '<span class="amt">' + fmt(spent) + '</span>' : '';
+      html += '<button class="' + cls + '" data-date="' + ds + '"><span class="dd">' + d + '</span>' + amt + '</button>';
+    }
+    html += '</div>';
+    html += '<div class="cal-legend"><span><i style="background:rgba(22,163,74,.45)"></i>≤1000</span><span><i style="background:rgba(220,38,38,.45)"></i>&gt;1000</span><span><i style="background:var(--surface-3)"></i>нет трат</span></div>';
+    cal.innerHTML = html;
+    cal.querySelectorAll('button[data-date]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        viewDate = this.getAttribute('data-date');
+        cal.hidden = true;
+        render();
+      });
+    });
+  }
+
+  // ---- действия ----
+  function addEntry(){
+    var amtEl = document.getElementById('amount');
+    var amount = parseFloat(amtEl.value);
+    if(!(amount > 0)){
+      amtEl.focus();
+      amtEl.style.borderColor = 'var(--danger)';
+      setTimeout(function(){ amtEl.style.borderColor = ''; }, 1200);
+      return;
+    }
+    var date = document.getElementById('date').value || todayStr();
+    var entry = {
+      id: Date.now() + '-' + Math.random().toString(36).slice(2,7),
+      amount: amount,
+      category: selectedCat,
+      comment: document.getElementById('comment').value.trim(),
+      date: date
+    };
+    entries.push(entry);
+    save();
+    viewDate = date;               // показать день, в который добавили
+    amtEl.value = '';
+    document.getElementById('comment').value = '';
+    document.getElementById('date').value = todayStr();
+    var dr = document.getElementById('dateRow');
+    if(dr.classList.contains('show')){
+      dr.classList.remove('show');
+      document.getElementById('dateToggle').textContent = 'Изменить дату (сейчас — сегодня)';
+    }
+    render();
+    updateHint();
+    amtEl.focus();
+  }
+
+  function removeEntry(id){
+    entries = entries.filter(function(e){ return e.id !== id; });
+    save();
+    render();
+    updateHint();
+  }
+
+  // ---- живая подсказка (вариант A: правила, без ИИ) ----
+  function updateHint(){
+    var box = document.getElementById('hint');
+    var a = parseFloat(document.getElementById('amount').value);
+    if(!(a > 0)){ box.className = 'hint'; box.innerHTML = ''; return; }
+
+    var date = document.getElementById('date').value || todayStr();
+    var daySpent = entries.reduce(function(s,e){ return e.date===date ? s + (+e.amount||0) : s; }, 0);
+    var afterDay = daySpent + a;
+    var totalAll = entries.reduce(function(s,e){ return s + (+e.amount||0); }, 0);
+    var balanceAfter = settings.startBalance - totalAll - a;
+    var daysLeft = Math.floor(Math.max(0, balanceAfter) / LIMIT);
+
+    var sev = 'ok', main;
+
+    // строка 1 — дневной лимит
+    if(a > LIMIT){
+      sev = 'danger';
+      main = 'Одна эта трата больше дневного лимита (1000). Точно сейчас?';
+    } else if(afterDay > LIMIT){
+      sev = 'danger';
+      main = 'Выйдешь за дневной лимит на ' + fmt(afterDay - LIMIT) + ' сом.';
+    } else if(LIMIT - afterDay < 200){
+      sev = 'warn';
+      main = 'Съест почти весь лимит — останется ' + fmt(LIMIT - afterDay) + ' сом на сегодня.';
+    } else {
+      main = 'Ок. Останется ' + fmt(LIMIT - afterDay) + ' сом из 1000 на сегодня.';
+    }
+
+    // строка 2 — общий остаток, темп, отсутствие дохода (запрос Максата)
+    var sub;
+    if(balanceAfter < 0){
+      sev = 'danger';
+      sub = 'Это больше, чем у тебя есть — остаток уйдёт в −' + fmt(Math.abs(balanceAfter)) + ' сом.';
+    } else {
+      sub = 'Остаток → ' + fmt(balanceAfter) + ' сом. При темпе 1000/день это ~' + daysLeft + ' дн., а доход пока не подключён.';
+    }
+
+    box.className = 'hint ' + sev;
+    box.innerHTML = '<div class="hint-main">' + main + '</div><div class="hint-sub">' + sub + '</div>';
+  }
+
+  // ---- инициализация ----
+  function init(){
+    buildCats();
+    document.getElementById('date').value = todayStr();
+
+    document.getElementById('addBtn').addEventListener('click', addEntry);
+    document.getElementById('amount').addEventListener('keydown', function(ev){
+      if(ev.key === 'Enter'){ ev.preventDefault(); addEntry(); }
+    });
+    document.getElementById('comment').addEventListener('keydown', function(ev){
+      if(ev.key === 'Enter'){ ev.preventDefault(); addEntry(); }
+    });
+    document.getElementById('amount').addEventListener('input', updateHint);
+    document.getElementById('date').addEventListener('change', updateHint);
+
+    document.getElementById('prevDay').addEventListener('click', function(){
+      if(viewDate <= monthStartStr()) return;   // трекер не уходит раньше текущего месяца
+      viewDate = shiftDay(viewDate, -1); render();
+    });
+    document.getElementById('nextDay').addEventListener('click', function(){
+      if(viewDate === todayStr()) return;
+      viewDate = shiftDay(viewDate, 1); render();
+    });
+
+    document.getElementById('dayLabel').addEventListener('click', function(){
+      var cal = document.getElementById('cal');
+      if(cal.hidden){ buildCalendar(); cal.hidden = false; }
+      else { cal.hidden = true; }
+    });
+
+    document.getElementById('dateToggle').addEventListener('click', function(){
+      var r = document.getElementById('dateRow');
+      r.classList.toggle('show');
+      this.textContent = r.classList.contains('show') ? 'Скрыть дату' : 'Изменить дату (сейчас — сегодня)';
+    });
+
+    // общий остаток: редактирование стартового баланса
+    var balRow = document.getElementById('balEditRow');
+    function saveBalance(){
+      var v = parseFloat(document.getElementById('balInput').value);
+      if(!(v >= 0)) return;
+      settings.startBalance = v;
+      saveSettings();
+      balRow.classList.remove('show');
+      render();
+    }
+    document.getElementById('balEdit').addEventListener('click', function(){
+      balRow.classList.toggle('show');
+      if(balRow.classList.contains('show')){
+        var inp = document.getElementById('balInput');
+        inp.value = settings.startBalance;
+        inp.focus();
+        inp.select();
+      }
+    });
+    document.getElementById('balSave').addEventListener('click', saveBalance);
+    document.getElementById('balInput').addEventListener('keydown', function(ev){
+      if(ev.key === 'Enter'){ ev.preventDefault(); saveBalance(); }
+    });
+
+    render();
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else { init(); }
+})();
+</script>
+</body>
+</html>

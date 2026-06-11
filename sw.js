@@ -1,7 +1,9 @@
-const CACHE_NAME = 'finpulse-v2';
+const CACHE_NAME = 'finpulse-v12';
 const urlsToCache = [
   './',
   './index.html',
+  './06_tracker/tracker.html',
+  './06_tracker/dashboard.html',
   './04_calculator/calculator.html'
 ];
 
